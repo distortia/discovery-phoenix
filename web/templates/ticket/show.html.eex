@@ -1,0 +1,63 @@
+<h2>Show ticket</h2>
+
+<ul>
+
+  <li>
+    <strong>Title:</strong>
+    <%= @ticket.title %>
+  </li>
+
+  <li>
+    <strong>Body:</strong>
+    <%= @ticket.body %>
+  </li>
+
+  <li>
+    <strong>Resolution:</strong>
+    <%= @ticket.resolution %>
+  </li>
+
+  <li>
+    <strong>Created on:</strong>
+    <%= @ticket.created_on %>
+  </li>
+
+  <li>
+    <strong>Assigned to:</strong>
+    <%= @ticket.assigned_to %>
+  </li>
+
+  <li>
+    <strong>Company:</strong>
+    <%= @ticket.company_id %>
+  </li>
+
+  <li>
+    <strong>Severity:</strong>
+    <%= @ticket.severity %>
+  </li>
+
+  <li>
+    <strong>Created by:</strong>
+    <%= @ticket.created_by %>
+  </li>
+
+  <li>
+    <strong>Updated on:</strong>
+    <%= @ticket.updated_on %>
+  </li>
+
+  <li>
+    <strong>Tags:</strong>
+    <%= @ticket.tags %>
+  </li>
+
+  <li>
+    <strong>Status:</strong>
+    <%= @ticket.status %>
+  </li>
+
+</ul>
+
+<%= link "Edit", to: ticket_path(@conn, :edit, @ticket) %>
+<%= link "Back", to: ticket_path(@conn, :index) %>
