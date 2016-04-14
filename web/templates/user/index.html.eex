@@ -6,8 +6,8 @@
       <th>First name</th>
       <th>Last name</th>
       <th>Email</th>
-      <th>Password</th>
-      <th>Companies</th>
+      <th>Password_hash</th>
+      <%# <th>Companies</th> %>
 
       <th></th>
     </tr>
@@ -18,13 +18,13 @@
       <td><%= user.first_name %></td>
       <td><%= user.last_name %></td>
       <td><%= user.email %></td>
-      <td><%= user.password %></td>
-      <td><%= user.companies %></td>
+      <td><%= user.password_hash %></td>
+      <td><%=# user.companies %></td>
 
       <td class="text-right">
         <%= link "Show", to: user_path(@conn, :show, user), class: "btn btn-default btn-xs" %>
-        <%= link "Edit", to: user_path(@conn, :edit, user), class: "btn btn-default btn-xs" %>
-        <%= link "Delete", to: user_path(@conn, :delete, user), method: :delete, data: [confirm: "Are you sure?"], class: "btn btn-danger btn-xs" %>
+        <%= #link "Edit", to: user_path(@conn, :edit, user), class: "btn btn-default btn-xs" %>
+        <%=# link "Delete", to: user_path(@conn, :delete, user), method: :delete, data: [confirm: "Are you sure?"], class: "btn btn-danger btn-xs" %>
       </td>
     </tr>
 <% end %>

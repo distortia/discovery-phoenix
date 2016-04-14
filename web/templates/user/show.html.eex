@@ -18,16 +18,16 @@
   </li>
 
   <li>
-    <strong>Password:</strong>
-    <%= @user.password %>
+    <strong>Password_hash:</strong>
+    <%= @user.password_hash %>
   </li>
 
   <li>
     <strong>Companies:</strong>
-    <%= @user.companies %>
+    <%=# @user.companies %>
   </li>
 
 </ul>
 
-<%= link "Edit", to: user_path(@conn, :edit, @user) %>
+<%=# link "Edit", to: user_path(@conn, :edit, @user) %>
 <%= link "Back", to: user_path(@conn, :index) %>

@@ -19,4 +19,16 @@
     </ul>
   </div>
 
+  <div class="col-lg-6">
+    <h4>Registration/Login</h4>
+    <ul>
+      <li>
+        <a href="<%= user_path @conn, :new %>">Register</a>
+      </li>     
+      <li>
+        <a href="<%= user_path @conn, :index %>">Login</a>
+      </li>
+    </ul>
+  </div>
+
 </div>

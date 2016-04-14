@@ -3,11 +3,11 @@ defmodule Discovery.UserController do
 
   alias Discovery.User
 
-  plug :scrub_params, "user" when action in [:create, :update]
+  plug :authenticate when action in [:index, :show]
 
   def index(conn, _params) do
     users = Repo.all(User)
-    render(conn, "index.html", users: users)
+    render conn, "index.html", users: users
   end
 
   def new(conn, _params) do
@@ -16,15 +16,27 @@ defmodule Discovery.UserController do
   end
 
   def create(conn, %{"user" => user_params}) do
-    changeset = User.changeset(%User{}, user_params)
+    changeset = User.registration_changeset(%User{}, user_params)
 
     case Repo.insert(changeset) do
-      {:ok, _user} ->
+      {:ok, user} ->
         conn
-        |> put_flash(:info, "User created successfully.")
-        |> redirect(to: user_path(conn, :index))
+        |> Discovery.Auth.login(user)
+        |> put_flash(:info, "Welcome #{user.first_name} #{user.last_name}!")
+        |> redirect(to: ticket_path(conn, :index))
       {:error, changeset} ->
         render(conn, "new.html", changeset: changeset)
+    end
+  end
+
+  defp authenticate(conn, _opts) do
+    if conn.assigns.current_user do
+      conn
+    else
+      conn
+      |> put_flash(:error, "You must be logged in to access this page")
+      |> redirect(to: page_path(conn, :index))
+      |> halt()
     end
   end
 

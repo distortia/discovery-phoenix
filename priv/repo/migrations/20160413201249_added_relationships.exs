@@ -3,6 +3,7 @@ defmodule Discovery.Repo.Migrations.AddedRelationships do
 
   def change do
   	alter table(:users) do
+    add :password_hash, :string
 		add :companies, references(:companies, on_delete: :nothing)
   	end
 
