@@ -9,7 +9,7 @@ defmodule Discovery.SessionController do
 		case Discovery.Auth.login_by_email_and_pass(conn, email, pass, repo: Repo) do
 			{:ok, conn} ->
 				conn
-				|> put_flash(:info, "Welcome Back!")
+				|> put_flash(:info, "Welcome back!")
 				|> redirect(to: ticket_path(conn, :index))
 			{:error, _reason, conn} ->
 				conn
@@ -20,6 +20,7 @@ defmodule Discovery.SessionController do
 
 	def delete(conn, _) do
 		conn
+		|> put_flash(:info, "You have been logged out")
 		|> Discovery.Auth.logout()
 		|> redirect(to: page_path(conn, :index))
 	end
