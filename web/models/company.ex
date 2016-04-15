@@ -1,10 +1,13 @@
 defmodule Discovery.Company do
   use Discovery.Web, :model
 
+  alias Discovery.User
+  alias Discovery.Ticket
+
   schema "companies" do
     field :name, :string
-    # belongs_to :owner, Discovery.Owner
-    # belongs_to :memebers, Discovery.Memebers
+
+    has_many :users, User
 
     timestamps
   end

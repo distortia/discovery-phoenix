@@ -30,5 +30,3 @@
 <% end %>
   </tbody>
 </table>
-
-<%= link "New user", to: user_path(@conn, :new) %>

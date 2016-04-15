@@ -24,12 +24,12 @@
 
   <li>
     <strong>Assigned to:</strong>
-    <%= @ticket.assigned_to %>
+    <%=# @ticket.assigned_to %>
   </li>
 
   <li>
     <strong>Company:</strong>
-    <%= @ticket.company_id %>
+    <%=# @ticket.company_id %>
   </li>
 
   <li>
@@ -39,7 +39,7 @@
 
   <li>
     <strong>Created by:</strong>
-    <%= @ticket.created_by %>
+    <%=# @ticket.created_by %>
   </li>
 
   <li>

@@ -1,6 +1,9 @@
 defmodule Discovery.Ticket do
   use Discovery.Web, :model
 
+  alias Discovery.Company
+  alias Discovery.User
+  
   schema "tickets" do
     field :title, :string
     field :body, :string
@@ -10,14 +13,12 @@ defmodule Discovery.Ticket do
     field :updated_on, Ecto.DateTime
     field :tags, {:array, :string}
     field :status, {:array, :string}
-    # belongs_to :assigned_to, Discovery.AssignedTo
-    # belongs_to :company, Discovery.Company
-    # belongs_to :created_by, Discovery.CreatedBy
-    # has_many :comments, Discovery.Comment
+
+    belongs_to :user, User
     timestamps
   end
 
-  @required_fields ~w(title body created_on severity status)
+  @required_fields ~w(title body)
   @optional_fields ~w(resolution tags)
 
   @doc """

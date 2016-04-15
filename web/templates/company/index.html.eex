@@ -4,8 +4,6 @@
   <thead>
     <tr>
       <th>Name</th>
-      <th>Owner</th>
-      <th>Memebers</th>
 
       <th></th>
     </tr>
@@ -14,8 +12,6 @@
 <%= for company <- @companies do %>
     <tr>
       <td><%= company.name %></td>
-      <td><%= company.owner %></td>
-      <td><%= company.memebers %></td>
 
       <td class="text-right">
         <%= link "Show", to: company_path(@conn, :show, company), class: "btn btn-default btn-xs" %>

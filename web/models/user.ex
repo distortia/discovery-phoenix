@@ -1,14 +1,18 @@
 defmodule Discovery.User do
   use Discovery.Web, :model
 
+  alias Discovery.Company
+  alias Discovery.Ticket
+  
   schema "users" do
     field :first_name, :string
     field :last_name, :string
     field :email, :string
     field :password, :string, virtual: true
     field :password_hash, :string
-    # belongs_to :companies, Discovery.Companies
-
+    
+    # has_many :companies, Company
+    has_many :tickets, Ticket
     timestamps
   end
 
