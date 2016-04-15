@@ -3,7 +3,7 @@ defmodule Discovery.UserController do
 
   alias Discovery.User
 
-  plug :authenticate when action in [:index, :show]
+  plug :authenticate_user when action in [:index, :show]
 
   def index(conn, _params) do
     users = Repo.all(User)

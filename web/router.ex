@@ -10,22 +10,32 @@ defmodule Discovery.Router do
     plug Discovery.Auth, repo: Discovery.Repo
   end
 
-  pipeline :api do
-    plug :accepts, ["json"]
-  end
-
   scope "/", Discovery do
     pipe_through :browser # Use the default browser stack
 
     get "/", PageController, :index
-    resources "/companies", CompanyController
-    resources "/users", UserController, only: [:index, :show, :new, :create]
-    resources "/tickets", TicketController
+    # Sessions is our login controller
     resources "/sessions", SessionController, only: [:new, :create, :delete]
+    # Keep the ability to register open
+    resources "/users", UserController, only: [:new, :create]
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", Discovery do
-  #   pipe_through :api
-  # end
+  # Added scope to the routes for the authentication middleware
+  scope "/users", Discovery do
+    pipe_through [:browser, :authenticate_user]
+    # Lock down the other User functions that should be behind authentication
+    resources "/", UserController, only: [:index, :show]
+  end
+  
+  # Companies router + middleware
+  scope "/companies", Discovery do
+    pipe_through [:browser, :authenticate_user]
+    resources "/", CompanyController
+  end
+  
+  # Tickets router + middleware
+  scope "/tickets", Discovery do
+    pipe_through [:browser, :authenticate_user]
+    resources "/", TicketController
+  end
 end

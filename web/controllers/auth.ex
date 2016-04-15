@@ -1,5 +1,7 @@
 defmodule Discovery.Auth do
 	import Plug.Conn
+	# Only pull in the Comeonin.Bcrypt methods we need
+	import Comeonin.Bcrypt, only: [checkpw: 2, dummy_checkpw: 0]
 
 	def init(opts) do
 		Keyword.fetch!(opts, :repo)
@@ -22,22 +24,6 @@ defmodule Discovery.Auth do
 		configure_session(conn, drop: true)
 	end
 
-	import Phoenix.Controller
-	alias Discovery.Router.Helpers
-
-	def authenticate_user(conn, _opts) do
-		if conn.assigns.current_user do
-			conn
-		else
-			conn
-			|> put_flash(:error, "Error, You must be logged in to access this page")
-			|> redirect(to: Helpers.page_path(conn, :index))
-			|> halt()
-		end
-	end
-
-	import Comeonin.Bcrypt, only: [checkpw: 2, dummy_checkpw: 0]
-
 	def login_by_email_and_pass(conn, email, given_pass, opts) do
 		repo = Keyword.fetch!(opts, :repo)
 		user = repo.get_by(Discovery.User, email: email)
@@ -50,6 +36,20 @@ defmodule Discovery.Auth do
 			true -> 
 				dummy_checkpw()
 				{:error, :not_found, conn}
+		end
+	end
+
+	import Phoenix.Controller
+	alias Discovery.Router.Helpers
+
+	def authenticate_user(conn, _opts) do
+		if conn.assigns.current_user do
+			conn
+		else
+			conn
+			|> put_flash(:error, "Error, You must be logged in to access this page")
+			|> redirect(to: Helpers.session_path(conn, :new))
+			|> halt()
 		end
 	end
 end

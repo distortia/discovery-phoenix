@@ -36,6 +36,8 @@ defmodule Discovery.Web do
 
       import Discovery.Router.Helpers
       import Discovery.Gettext
+      # Add the auth middleware to all controller functions
+      import Discovery.Auth, only: [authenticate_user: 2]
     end
   end
 
@@ -58,6 +60,8 @@ defmodule Discovery.Web do
   def router do
     quote do
       use Phoenix.Router
+      #Add Auth middleware to router
+      import Discovery.Auth, only: [authenticate_user: 2]
     end
   end
 
