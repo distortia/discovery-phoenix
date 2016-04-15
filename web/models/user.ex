@@ -21,7 +21,7 @@ defmodule Discovery.User do
   def changeset(model, params \\ :empty) do
     model
     |> cast(params, ~w(first_name last_name email), [])
-    |> validate_length(:email, min: 1, max: 20)
+    |> validate_length(:email, min: 1)
   end
 
   def registration_changeset(model, params) do
