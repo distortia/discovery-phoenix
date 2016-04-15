@@ -9,3 +9,4 @@
 	</div>
 	<%= submit "Log in", class: "btn btn-primary" %>
 <% end %>
+<%= link "Register", to: user_path(@conn, :new) %>
