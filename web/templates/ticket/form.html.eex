@@ -24,18 +24,6 @@
   </div>
 
   <div class="form-group">
-    <%= label f, :created_on, class: "control-label" %>
-    <%= datetime_select f, :created_on, class: "form-control" %>
-    <%= error_tag f, :created_on %>
-  </div>
-
-  <div class="form-group">
-    <%= label f, :updated_on, class: "control-label" %>
-    <%= datetime_select f, :updated_on, class: "form-control" %>
-    <%= error_tag f, :updated_on %>
-  </div>
-
-  <div class="form-group">
     <%= submit "Submit", class: "btn btn-primary" %>
   </div>
 <% end %>

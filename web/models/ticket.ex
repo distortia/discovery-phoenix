@@ -8,9 +8,7 @@ defmodule Discovery.Ticket do
     field :title, :string
     field :body, :string
     field :resolution, :string
-    field :created_on, Ecto.DateTime
     field :severity, {:array, :integer}
-    field :updated_on, Ecto.DateTime
     field :tags, {:array, :string}
     field :status, {:array, :string}
 

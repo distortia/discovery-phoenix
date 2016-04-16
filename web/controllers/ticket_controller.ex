@@ -82,7 +82,7 @@ defmodule Discovery.TicketController do
   end
 
   def delete(conn, %{"id" => id}, user) do
-    ticket = Repo.get_by!(user_tickets(user), id)
+    ticket = Repo.get!(user_tickets(user), id)
     Repo.delete!(ticket)
 
     conn

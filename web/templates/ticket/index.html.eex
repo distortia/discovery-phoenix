@@ -24,12 +24,12 @@
       <td><%= ticket.title %></td>
       <td><%= ticket.body %></td>
       <td><%= ticket.resolution %></td>
-      <td><%= ticket.created_on %></td>
+      <td><%= ticket.inserted_at %></td>
       <td><%=# ticket.assigned_to %></td>
       <td><%=# ticket.company_id %></td>
       <td><%= ticket.severity %></td>
       <td><%=# ticket.created_by %></td>
-      <td><%= ticket.updated_on %></td>
+      <td><%= ticket.updated_at %></td>
       <td><%= ticket.tags %></td>
       <td><%= ticket.status %></td>
 
