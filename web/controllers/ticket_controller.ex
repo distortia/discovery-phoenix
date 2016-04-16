@@ -28,6 +28,8 @@ defmodule Discovery.TicketController do
     user
     |> build_assoc(:tickets)
     |> Ticket.changeset()
+
+    render(conn, "new.html", changeset: changeset)
   end
 
   # We pass in the user as a param of the new ticket process
