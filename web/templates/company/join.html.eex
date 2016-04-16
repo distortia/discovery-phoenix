@@ -1,4 +1,7 @@
 <h2>Join a company!</h2>
 
+<%= render "form.html", changeset: @changeset,
+                        action: company_path(@conn, :join_company) %>
+
 
 <%= link "Create a company", to: company_path(@conn, :new) %>

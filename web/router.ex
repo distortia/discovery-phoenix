@@ -31,6 +31,7 @@ defmodule Discovery.Router do
   scope "/companies", Discovery do
     pipe_through [:browser, :authenticate_user]
     get "/join", CompanyController, :join
+    post "/join", CompanyController, :join_company
     resources "/", CompanyController, except: [:join]
   end
   

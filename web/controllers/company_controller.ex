@@ -66,7 +66,19 @@ defmodule Discovery.CompanyController do
   end
 
   def join(conn, _placeholder) do
-    companies = Repo.all(Company)
-    render(conn, "join.html", companies: companies)
+    changeset = Company.changeset(%Company{}) 
+    render(conn, "join.html", changeset: changeset)
+  end
+
+  def join_company(conn, %{"name" => name}) do
+    company = Repo.get_by!(Company, name: name)
+    case company do
+      {:ok} ->
+      conn
+      |> put_flash(:info, "Company Joined!")
+      |> redirect(to: ticket_path(conn, :index))
+      {:error, _} ->
+        render(conn, "join.html", company: company)
+    end
   end
 end
