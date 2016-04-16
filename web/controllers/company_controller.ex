@@ -5,19 +5,25 @@ defmodule Discovery.CompanyController do
 
   plug :scrub_params, "company" when action in [:create, :update]
 
-  def index(conn, _params) do
+  # This Action assigns the current user to the connection
+  # Allowing us to pass the user to different controllers and routes
+  def action(conn, _) do
+    apply(__MODULE__, action_name(conn), [conn, conn.params, conn.assigns.current_user])
+  end
+
+  def index(conn, _params, user) do
     companies = Repo.all(Company)
     render(conn, "index.html", companies: companies)
   end
 
-  def new(conn, _params) do
+  def new(conn, _params, user) do
     changeset = Company.changeset(%Company{})
     render(conn, "new.html", changeset: changeset)
   end
 
-  def create(conn, %{"company" => company_params}) do
+  def create(conn, %{"company" => company_params}, user) do
     changeset = Company.changeset(%Company{}, company_params)
-
+    
     case Repo.insert(changeset) do
       {:ok, _company} ->
         conn
@@ -28,18 +34,18 @@ defmodule Discovery.CompanyController do
     end
   end
 
-  def show(conn, %{"id" => id}) do
+  def show(conn, %{"id" => id}, user) do
     company = Repo.get!(Company, id)
     render(conn, "show.html", company: company)
   end
 
-  def edit(conn, %{"id" => id}) do
+  def edit(conn, %{"id" => id}, user) do
     company = Repo.get!(Company, id)
     changeset = Company.changeset(company)
     render(conn, "edit.html", company: company, changeset: changeset)
   end
 
-  def update(conn, %{"id" => id, "company" => company_params}) do
+  def update(conn, %{"id" => id, "company" => company_params}, user) do
     company = Repo.get!(Company, id)
     changeset = Company.changeset(company, company_params)
 
@@ -53,7 +59,7 @@ defmodule Discovery.CompanyController do
     end
   end
 
-  def delete(conn, %{"id" => id}) do
+  def delete(conn, %{"id" => id}, user) do
     company = Repo.get!(Company, id)
 
     # Here we use delete! (with a bang) because we expect
@@ -65,20 +71,24 @@ defmodule Discovery.CompanyController do
     |> redirect(to: company_path(conn, :index))
   end
 
-  def join(conn, _placeholder) do
+  def join(conn, _placeholder, user) do
     changeset = Company.changeset(%Company{}) 
-    render(conn, "join.html", changeset: changeset)
+    render(conn, "join.html", changeset: changeset, user: user)
   end
 
-  def join_company(conn, %{"name" => name}) do
-    company = Repo.get_by!(Company, name: name)
+  def join_company(conn, %{"name" => name}, user) do
+    # We omit the ! in get_by so we don't auto fail when company doesnt exist or could be found
+    company = Repo.get_by(Company, name: name)
     case company do
-      {:ok} ->
+      nil ->
+        conn
+        |> put_flash(:error, "No company by the name: #{name}")
+        render(conn, "join.html")
+      _ ->
       conn
       |> put_flash(:info, "Company Joined!")
+      |> build_assoc(:company)
       |> redirect(to: ticket_path(conn, :index))
-      {:error, _} ->
-        render(conn, "join.html", company: company)
     end
   end
 end

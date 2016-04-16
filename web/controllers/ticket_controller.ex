@@ -7,6 +7,7 @@ defmodule Discovery.TicketController do
 
   # This Action assigns the current user to the connection
   # Allowing us to pass the user to different controllers and routes
+  # https://github.com/phoenixframework/phoenix/blob/master/lib/phoenix/controller.ex#L96
   def action(conn, _) do
     apply(__MODULE__, action_name(conn), [conn, conn.params, conn.assigns.current_user])
   end
