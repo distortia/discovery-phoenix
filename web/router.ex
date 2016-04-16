@@ -30,7 +30,8 @@ defmodule Discovery.Router do
   # Companies router + middleware
   scope "/companies", Discovery do
     pipe_through [:browser, :authenticate_user]
-    resources "/", CompanyController
+    get "/join", CompanyController, :join
+    resources "/", CompanyController, except: [:join]
   end
   
   # Tickets router + middleware

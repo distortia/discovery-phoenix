@@ -64,4 +64,9 @@ defmodule Discovery.CompanyController do
     |> put_flash(:info, "Company deleted successfully.")
     |> redirect(to: company_path(conn, :index))
   end
+
+  def join(conn, _placeholder) do
+    companies = Repo.all(Company)
+    render(conn, "join.html", companies: companies)
+  end
 end

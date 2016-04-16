@@ -23,7 +23,7 @@ defmodule Discovery.UserController do
         conn
         |> Discovery.Auth.login(user)
         |> put_flash(:info, "Welcome #{user.first_name} #{user.last_name}!")
-        |> redirect(to: ticket_path(conn, :index))
+        |> redirect(to: company_path(conn, :new))
       {:error, changeset} ->
         render(conn, "new.html", changeset: changeset)
     end

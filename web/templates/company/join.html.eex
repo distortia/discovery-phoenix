@@ -1,0 +1,4 @@
+<h2>Join a company!</h2>
+
+
+<%= link "Create a company", to: company_path(@conn, :new) %>
