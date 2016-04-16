@@ -11,8 +11,9 @@ defmodule Discovery.User do
     field :password, :string, virtual: true
     field :password_hash, :string
     
-    # has_many :companies, Company
+    belongs_to :company, Company
     has_many :tickets, Ticket
+    
     timestamps
   end
 

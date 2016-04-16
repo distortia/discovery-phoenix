@@ -23,8 +23,8 @@
   </li>
 
   <li>
-    <strong>Companies:</strong>
-    <%=# @user.companies %>
+    <strong>Company:</strong>
+    <%=# @user.company %>
   </li>
 
 </ul>

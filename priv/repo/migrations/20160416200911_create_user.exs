@@ -7,11 +7,9 @@ defmodule Discovery.Repo.Migrations.CreateUser do
       add :last_name, :string
       add :email, :string
       add :password, :string
-      # add :companies, references(:companies, on_delete: :nothing)
-
+      add :password_hash, :string
+    
       timestamps
     end
-    # create index(:users, [:companies])
-
   end
 end

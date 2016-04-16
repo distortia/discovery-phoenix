@@ -14,7 +14,9 @@ defmodule Discovery.Ticket do
     field :tags, {:array, :string}
     field :status, {:array, :string}
 
+    # Set relationship to user
     belongs_to :user, User
+
     timestamps
   end
 

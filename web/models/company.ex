@@ -6,8 +6,10 @@ defmodule Discovery.Company do
 
   schema "companies" do
     field :name, :string
-
+    
     has_many :users, User
+    # Sets up the user ticket company relationship
+    has_many :user_tickets, through: [:users, :tickets]
 
     timestamps
   end

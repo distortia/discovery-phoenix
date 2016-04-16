@@ -1,22 +1,10 @@
 <h2>Show company</h2>
 
 <ul>
-
   <li>
     <strong>Name:</strong>
     <%= @company.name %>
   </li>
-
-  <li>
-    <strong>Owner:</strong>
-    <%= @company.owner %>
-  </li>
-
-  <li>
-    <strong>Memebers:</strong>
-    <%= @company.memebers %>
-  </li>
-
 </ul>
 
 <%= link "Edit", to: company_path(@conn, :edit, @company) %>
