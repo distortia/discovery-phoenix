@@ -24,3 +24,4 @@
 </table>
 
 <%= link "New company", to: company_path(@conn, :new) %>
+<%= link "Join company", to: company_path(@conn, :join) %>
