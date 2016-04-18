@@ -31,13 +31,18 @@ defmodule Discovery.UserController do
 
   def show(conn, %{"id" => id}) do
     user = Repo.get!(User, id)
+    # We have to check for nil here before doing any sort of query
+    # Its an elixir/phoenix thing.
     if is_nil(user.company_id) do
+      # If the user doesnt have a company id
+      # we can throw in anything into the view to be rendered to @company in the template
       conn
         |> assign(:company, "None")
         |> render("show.html", user: user)
-      else
-        company = Repo.get_by(Discovery.Company, id: user.company_id)
-        conn 
+    else
+      # We found a user with a company and want to return the company name to the template
+      company = Repo.get_by(Discovery.Company, id: user.company_id)
+      conn 
         |> assign(:company, company.name)
         |> render("show.html", user: user)
     end
