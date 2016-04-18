@@ -102,15 +102,14 @@ defmodule Discovery.CompanyController do
         conn
         |> put_flash(:error, "No company by the name: #{company_name}")
         |> render("join.html", changeset: changeset, user: user)
-      _ ->
-        # Update requires a changeset
-        user = Repo.get(Discovery.User, user.id)
-        user = Repo.preload(user, :company)
-        # Find the company 
-        company = Repo.get_by!(Company, name: company_name)
-        user = Ecto.build_assoc(company, :users, Map.from_struct user)
-        # This stays
-        case Repo.update(user) do
+      _ -> # if its anything but nil do this
+        # Find the company and build the association
+        company = 
+          Repo.get_by!(Company, name: company_name)
+          |> Ecto.build_assoc(:users, Map.from_struct user)
+
+        # Update the relationship
+        case Repo.update(company) do
           {:ok, _company} ->
             conn
             |> put_flash(:info, "Company joined successfully")
