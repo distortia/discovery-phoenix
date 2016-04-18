@@ -28,6 +28,8 @@ defmodule Discovery.CompanyController do
       {:ok, _company} ->
         conn
         |> put_flash(:info, "Company created successfully.")
+        # TODO: Need to add the association when we create a company to the user
+        # |> build_assoc()
         |> redirect(to: company_path(conn, :index))
       {:error, changeset} ->
         render(conn, "new.html", changeset: changeset)
@@ -76,18 +78,21 @@ defmodule Discovery.CompanyController do
     render(conn, "join.html", changeset: changeset, user: user)
   end
 
-  def join_company(conn, %{"name" => name}, user) do
+  def join_company(conn, %{"company" => company_params}, user) do
+   changeset = Company.changeset(%Company{}, company_params)
+    # Company_params comes back as a Map in the form %{"name" : "name of company"}
+    # Extract the company name from the map
+    company_name = Map.get(company_params, "name")
     # We omit the ! in get_by so we don't auto fail when company doesnt exist or could be found
-    company = Repo.get_by(Company, name: name)
-    case company do
+    case Repo.get_by(Company, name: company_name) do
       nil ->
         conn
-        |> put_flash(:error, "No company by the name: #{name}")
-        render(conn, "join.html")
+        |> put_flash(:error, "No company by the name: #{company_name}")
+        |> render("join.html", changeset: changeset, user: user)
       _ ->
       conn
       |> put_flash(:info, "Company Joined!")
-      |> build_assoc(:company)
+      # |> build_assoc(:company)
       |> redirect(to: ticket_path(conn, :index))
     end
   end
