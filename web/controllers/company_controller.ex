@@ -18,18 +18,29 @@ defmodule Discovery.CompanyController do
 
   def new(conn, _params, user) do
     changeset = Company.changeset(%Company{})
+    # Need to get the company and build association with the user
+    # changeset = 
+    # company
+    # |> build_assoc(:user)
+    # |> Company.changeset(company_params)
+
     render(conn, "new.html", changeset: changeset)
   end
 
   def create(conn, %{"company" => company_params}, user) do
+    # Original Changeset
     changeset = Company.changeset(%Company{}, company_params)
+
+    # Need to get the company and build association with the user
+    # changeset = 
+    # company
+    # |> build_assoc(:user)
+    # |> Company.changeset(company_params)
     
     case Repo.insert(changeset) do
       {:ok, _company} ->
         conn
         |> put_flash(:info, "Company created successfully.")
-        # TODO: Need to add the association when we create a company to the user
-        # |> build_assoc()
         |> redirect(to: company_path(conn, :index))
       {:error, changeset} ->
         render(conn, "new.html", changeset: changeset)
@@ -74,26 +85,53 @@ defmodule Discovery.CompanyController do
   end
 
   def join(conn, _placeholder, user) do
-    changeset = Company.changeset(%Company{}) 
+    changeset = Company.changeset(%Company{})
     render(conn, "join.html", changeset: changeset, user: user)
   end
 
-  def join_company(conn, %{"company" => company_params}, user) do
-   changeset = Company.changeset(%Company{}, company_params)
+
+  def join_company(conn, %{"company" => company_params}, user) do  
+    user = Repo.preload(user, :company)
     # Company_params comes back as a Map in the form %{"name" : "name of company"}
     # Extract the company name from the map
     company_name = Map.get(company_params, "name")
     # We omit the ! in get_by so we don't auto fail when company doesnt exist or could be found
     case Repo.get_by(Company, name: company_name) do
       nil ->
+        changeset = Company.changeset(%Company{}, company_params)
         conn
         |> put_flash(:error, "No company by the name: #{company_name}")
         |> render("join.html", changeset: changeset, user: user)
       _ ->
-      conn
-      |> put_flash(:info, "Company Joined!")
-      # |> build_assoc(:company)
-      |> redirect(to: ticket_path(conn, :index))
-    end
+        # Update requires a changeset
+        user = Repo.get(Discovery.User, user.id)
+        user = Repo.preload(user, :company)
+        # Find the company 
+        company = Repo.get_by!(Company, name: company_name)
+        user = Ecto.build_assoc(company, :users, Map.from_struct user)
+        # This stays
+        case Repo.update(user) do
+          {:ok, _company} ->
+            conn
+            |> put_flash(:info, "Company joined successfully")
+            |> redirect(to: ticket_path(conn, :index), user: user)
+          {:error, changeset} -> 
+            render(conn, "join.html", changeset: changeset)
+        end
+          # My console steps to do the same thing
+          # user = Repo.get_by!(User, id: 3)
+          # user = Repo.preload(user, :company)
+          # company = Repo.get_by!(Company, id: 1)
+          # user = Ecto.build_assoc(company, :users, Map.from_struct user)
+          # user = Repo.update!(user)
+      end
+  end
+  # Function to look up users for the given company
+  defp company_users(company) do
+    assoc(company, :users)
+  end
+
+  defp user_company(user) do
+    assoc(user, :company)
   end
 end
