@@ -10,7 +10,7 @@ defmodule Discovery.Company do
     has_many :users, User
     # Sets up the user ticket company relationship
     has_many :user_tickets, through: [:users, :tickets]
-
+    
     timestamps
   end
 

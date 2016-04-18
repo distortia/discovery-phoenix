@@ -31,7 +31,16 @@ defmodule Discovery.UserController do
 
   def show(conn, %{"id" => id}) do
     user = Repo.get!(User, id)
-    render(conn, "show.html", user: user)
+    if is_nil(user.company_id) do
+      conn
+        |> assign(:company, "None")
+        |> render("show.html", user: user)
+      else
+        company = Repo.get_by(Discovery.Company, id: user.company_id)
+        conn 
+        |> assign(:company, company.name)
+        |> render("show.html", user: user)
+    end
   end
 
   def edit(conn, %{"id" => id}) do

@@ -24,7 +24,7 @@
 
   <li>
     <strong>Company:</strong>
-    <%=# @user.company %>
+    <%= @company %>
   </li>
 
 </ul>
