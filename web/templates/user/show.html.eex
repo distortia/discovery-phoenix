@@ -29,5 +29,5 @@
 
 </ul>
 
-<%=# link "Edit", to: user_path(@conn, :edit, @user) %>
+<%= link "Edit", to: user_path(@conn, :edit, @user) %>
 <%= link "Back", to: user_path(@conn, :index) %>

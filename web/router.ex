@@ -24,7 +24,7 @@ defmodule Discovery.Router do
   scope "/users", Discovery do
     pipe_through [:browser, :authenticate_user]
     # Lock down the other User functions that should be behind authentication
-    resources "/", UserController, only: [:index, :show]
+    resources "/", UserController, except: [:new, :create]
   end
   
   # Companies router + middleware
