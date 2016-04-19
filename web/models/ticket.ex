@@ -8,9 +8,9 @@ defmodule Discovery.Ticket do
     field :title, :string
     field :body, :string
     field :resolution, :string
-    field :created_on, Ecto.DateTime
+    field :created_on, :string
     field :severity, {:array, :integer}
-    field :updated_on, Ecto.DateTime
+    field :updated_on, :string
     field :tags, {:array, :string}
     field :status, {:array, :string}
 
@@ -20,7 +20,7 @@ defmodule Discovery.Ticket do
     timestamps
   end
 
-  @required_fields ~w(title body)
+  @required_fields ~w(title body created_on updated_on)
   @optional_fields ~w(resolution tags)
 
   @doc """
