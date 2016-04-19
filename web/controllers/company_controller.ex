@@ -50,8 +50,15 @@ defmodule Discovery.CompanyController do
     company = 
     Repo.get!(Company, id)
     |> Repo.preload(:users)
+
+    tickets = 
+      Enum.map company.users, fn(user) -> 
+        user = Repo.preload(user, :tickets)
+        user.tickets
+       end
+       IO.inspect tickets
     # I passed users as their own thing to the view for ease of use
-    render(conn, "show.html", company: company, users: company.users)
+    render(conn, "show.html", company: company, users: company.users, tickets: List.flatten(tickets))
   end
 
   def edit(conn, %{"id" => id}, user) do
