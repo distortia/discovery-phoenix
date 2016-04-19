@@ -51,14 +51,15 @@ defmodule Discovery.CompanyController do
     Repo.get!(Company, id)
     |> Repo.preload(:users)
 
-    tickets = 
+    tickets =
+      #Enum.map returns a list of tickets(which happen to be lists, thats why we flatten at the end)
       Enum.map company.users, fn(user) -> 
         user = Repo.preload(user, :tickets)
         user.tickets
        end
-       IO.inspect tickets
-    # I passed users as their own thing to the view for ease of use
-    render(conn, "show.html", company: company, users: company.users, tickets: List.flatten(tickets))
+     tickets = List.flatten(tickets)
+    # I passed users/tickets as their own thing to the view for ease of use
+    render(conn, "show.html", company: company, users: company.users, tickets: tickets)
   end
 
   def edit(conn, %{"id" => id}, user) do
