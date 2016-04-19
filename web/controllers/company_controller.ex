@@ -52,7 +52,8 @@ defmodule Discovery.CompanyController do
     |> Repo.preload(:users)
 
     tickets =
-      #Enum.map returns a list of tickets(which happen to be lists, thats why we flatten at the end)
+      # Enum.map returns a list of tickets(which happen to be lists, thats why we flatten at the end)
+      # http://elixir-lang.org/docs/stable/elixir/Enum.html - # TODO: The Dict example may be a better fit for us
       Enum.map company.users, fn(user) -> 
         user = Repo.preload(user, :tickets)
         user.tickets
