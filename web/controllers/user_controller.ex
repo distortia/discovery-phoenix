@@ -6,7 +6,10 @@ defmodule Discovery.UserController do
   plug :authenticate_user when action in [:index, :show]
 
   def index(conn, _params) do
-    users = Repo.all(User)
+    users = 
+    Repo.all(User)
+    |> Repo.preload(:company)
+    
     render conn, "index.html", users: users
   end
 
@@ -46,7 +49,7 @@ defmodule Discovery.UserController do
       # We found a user with a company and want to return the company name to the template
       company = Repo.get_by(Discovery.Company, id: user.company_id)
       conn 
-        |> assign(:company, company.name)
+        |> assign(:company, company)
         |> render("show.html", user: user)
     end
   end

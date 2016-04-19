@@ -1,11 +1,29 @@
-<h2>Show company</h2>
+<h2><%= @company.name %></h2>
+<hr>
+<h2>Users</h2>
+<table class="table">
+	<thead>
+		<tr>
+			<th>First Name</th>
+			<th>Last Name</th>
+			<th>Email</th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody>
+	<%= for user <- @users do %>
+		<tr>
+			<td><%= user.first_name %></td>
+			<td><%= user.last_name %></td>
+			<td><%= user.email %></td>
 
-<ul>
-  <li>
-    <strong>Name:</strong>
-    <%= @company.name %>
-  </li>
-</ul>
+			<td class="text-right">
+				<%= link "Show", to: user_path(@conn, :show, user), class: "btn btn-default btn-xs" %>
+			</td>
+		</tr>
+	<% end %>
+	</tbody>
+</table>
 
 <%= link "Edit", to: company_path(@conn, :edit, @company) %>
 <%= link "Back", to: company_path(@conn, :index) %>

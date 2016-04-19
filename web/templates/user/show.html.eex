@@ -24,7 +24,7 @@
 
   <li>
     <strong>Company:</strong>
-    <%= @company %>
+    <%= link "#{@company.name}", to: company_path(@conn, :show, @company.id) %>
   </li>
 
 </ul>

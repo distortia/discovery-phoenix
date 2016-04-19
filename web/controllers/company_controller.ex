@@ -47,8 +47,11 @@ defmodule Discovery.CompanyController do
   end
 
   def show(conn, %{"id" => id}, user) do
-    company = Repo.get!(Company, id)
-    render(conn, "show.html", company: company)
+    company = 
+    Repo.get!(Company, id)
+    |> Repo.preload(:users)
+    # I passed users as their own thing to the view for ease of use
+    render(conn, "show.html", company: company, users: company.users)
   end
 
   def edit(conn, %{"id" => id}, user) do
