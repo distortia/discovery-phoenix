@@ -23,7 +23,6 @@ defmodule Discovery.CompanyController do
     # company
     # |> build_assoc(:user)
     # |> Company.changeset(company_params)
-
     render(conn, "new.html", changeset: changeset)
   end
 

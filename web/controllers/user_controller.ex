@@ -30,7 +30,10 @@ defmodule Discovery.UserController do
   end
 
   def show(conn, %{"id" => id}) do
-    user = Repo.get!(User, id)
+    user = 
+    Repo.get!(User, id)
+    |> Repo.preload(:company)
+
     # We have to check for nil here before doing any sort of query
     # Its an elixir/phoenix thing.
     if is_nil(user.company_id) do
