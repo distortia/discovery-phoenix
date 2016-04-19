@@ -1,0 +1,46 @@
+<h2>Tickets</h2>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th>Body</th>
+      <th>Resolution</th>
+      <th>Created on</th>
+      <th>Assigned to</th>
+      <th>Company</th>
+      <th>Severity</th>
+      <th>Created by</th>
+      <th>Updated on</th>
+      <th>Tags</th>
+      <th>Status</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+<%# <%=# for ticket <- @tickets do %>
+    <tr>
+      <td><%= # ticket.title %></td>
+      <td><%= # ticket.body %></td>
+      <td><%= #ticket.resolution %></td>
+      <td><%= #ticket.created_on %></td>
+      <td><%=# ticket.assigned_to %></td>
+      <td><%=# ticket.company_id %></td>
+      <td><%= #ticket.severity %></td>
+      <td><%=# ticket.created_by %></td>
+      <td><%= #ticket.updated_on %></td>
+      <td><%= #ticket.tags %></td>
+      <td><%= #ticket.status %></td>
+
+      <td class="text-right">
+        <%= #link "Show", to: ticket_path(@conn, :show, ticket), class: "btn btn-default btn-xs" %>
+        <%= #link "Edit", to: ticket_path(@conn, :edit, ticket), class: "btn btn-default btn-xs" %>
+        <%= #link "Delete", to: ticket_path(@conn, :delete, ticket), method: :delete, data: [confirm: "Are you sure?"], class: "btn btn-danger btn-xs" %>
+      </td>
+    </tr>
+<% # end %>
+  </tbody>
+</table>
+
+<%= link "New ticket", to: ticket_path(@conn, :new) %>
