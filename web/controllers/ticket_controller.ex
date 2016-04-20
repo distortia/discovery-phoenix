@@ -29,19 +29,21 @@ defmodule Discovery.TicketController do
     user
     |> build_assoc(:tickets)
     |> Ticket.changeset()
-
     render(conn, "new.html", changeset: changeset)
   end
 
   # We pass in the user as a param of the new ticket process
+  # Changeset updates courtesy of 
+  # http://stackoverflow.com/questions/33027873/phoenix-framework-how-to-set-default-values-in-ecto-model
   def create(conn, %{"ticket" => ticket_params}, user) do
     changeset =
     user
     |> build_assoc(:tickets)
     |> Ticket.changeset(ticket_params)
-    # Check for the :ok tuple from inserting into the DB
-    # If :ok -> All is good
-    # IF :error -> Render new ticket page with form errors
+    |> Ecto.Changeset.put_change(:created_on, "#{Ecto.DateTime.utc}")
+    |> Ecto.Changeset.put_change(:updated_on, "#{Ecto.DateTime.utc}")
+    |> Ecto.Changeset.put_change(:created_by, "#{user.first_name} #{user.last_name}")
+    
     case Repo.insert(changeset) do
       {:ok, _ticket} ->
         conn
@@ -70,7 +72,9 @@ defmodule Discovery.TicketController do
   # Same deal as Discovery.Ticket.Create/3
   def update(conn, %{"id" => id, "ticket" => ticket_params}, user) do
     ticket = Repo.get!(user_tickets(user), id)
-    changeset = Ticket.changeset(ticket, ticket_params)
+    changeset = 
+      Ticket.changeset(ticket, ticket_params)
+      |> Ecto.Changeset.put_change(:updated_on, "#{Ecto.DateTime.utc}")
 
     case Repo.update(changeset) do
       {:ok, _ticket} ->

@@ -39,7 +39,7 @@
 
   <li>
     <strong>Created by:</strong>
-    <%=# @ticket.created_by %>
+    <%= @ticket.created_by %>
   </li>
 
   <li>

@@ -13,6 +13,7 @@ defmodule Discovery.Ticket do
     field :updated_on, :string
     field :tags, {:array, :string}
     field :status, {:array, :string}
+    field :created_by, :string
 
     # Set relationship to user
     belongs_to :user, User
@@ -20,7 +21,7 @@ defmodule Discovery.Ticket do
     timestamps
   end
 
-  @required_fields ~w(title body created_on updated_on)
+  @required_fields ~w(title body)
   @optional_fields ~w(resolution tags)
 
   @doc """
