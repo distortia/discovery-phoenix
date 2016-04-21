@@ -20,6 +20,9 @@
   </div>
 
   <div class="col-lg-6">
+    <%= if @current_user do %>
+
+    <% else %>
     <h4>Registration/Login</h4>
     <ul>
       <li>
@@ -29,6 +32,7 @@
         <a href="<%= session_path(@conn, :new) %>">Login</a>
       </li>
     </ul>
+    <% end %>
   </div>
 
 </div>

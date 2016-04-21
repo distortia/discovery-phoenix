@@ -24,9 +24,10 @@
 
   <li>
     <strong>Company:</strong>
-    <%= link "#{@company.name}", to: company_path(@conn, :show, @company.id) %>
+    <%= if @user.company do %>
+      <%= link "#{@company.name}", to: company_path(@conn, :show, @company.id) %>
+    <% end %>
   </li>
-
 </ul>
 
 <%= link "Edit", to: user_path(@conn, :edit, @user) %>
