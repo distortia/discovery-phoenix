@@ -3,6 +3,12 @@ defmodule Discovery.TicketControllerTest do
 
   alias Discovery.Ticket
 
+  @valid_attrs %{title: "Ticket title", body: "ticket body"}
+  @invalid_attrs %{title: "invalid"}
+
+  # Get the count of all the tickets in the db
+  defp ticket_count(query), do: Repo.one(from v in query, select: count(v.id))
+
   setup %{conn: conn} = config do
     if email = config[:login_as] do
       user = insert_user(email: "unittest@unittest.com", first_name: "unit", last_name: "test", password: "123123")
@@ -11,6 +17,32 @@ defmodule Discovery.TicketControllerTest do
     else
       :ok
     end
+  end
+
+  @tag login_as: "unittest@unittest.com"
+  test "GET /tickets will show tickets for the user", %{conn: conn, user: user} do
+    ticket  = insert_ticket(user, title: "unit test ticket", body: "unit test body")
+    other_ticket = insert_ticket(insert_user(email: "otherunittest@unittest.com"), title: "another ticket", body: "mticket")
+
+    conn = get conn, ticket_path(conn, :index)
+    assert html_response(conn, 200) =~ ~r/Listing tickets/
+    assert String.contains?(conn.resp_body, ticket.title)
+    refute String.contains?(conn.resp_body, other_ticket.title)
+  end
+
+  @tag login_as: "unittest@unittest.com"
+  test "Create ticket and redirect", %{conn: conn, user: user} do
+    conn = post conn, ticket_path(conn, :create), ticket: @valid_attrs
+    assert redirected_to(conn) == ticket_path(conn, :index)
+    assert Repo.get_by!(Ticket, @valid_attrs).user_id == user.id
+  end
+
+  @tag login_as: "unittest@unittest.com"
+  test "does not create ticket and renders errors when invalid", %{conn: conn} do
+    count_before = ticket_count(Ticket)
+    conn = post conn, ticket_path(conn, :create), ticket: @invalid_attrs
+    assert html_response(conn, 200) =~ "check the errors"
+    assert ticket_count(Ticket) == count_before
   end
 
   test "Redirect from /tickets to index with error", %{conn: conn} do

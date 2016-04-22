@@ -5,14 +5,14 @@ defmodule Discovery.UserControllerTest do
 
   setup %{conn: conn} = config do
     if email = config[:login_as] do
-      user = insert_user(email: "unittest@unittest.com", first_name: "unit", last_name: "test", password: "123123")
-      conn = assign(conn(), :current_user, user)
+      user = insert_user(email: email)
+      conn = assign(conn, :current_user, user)
       {:ok, conn: conn, user: user}
     else
       :ok
     end
   end
-  
+
   test "Redirect from /users to index with error due to authentication", %{conn: conn} do
     Enum.each([
       get(conn, user_path(conn, :index)),
@@ -29,5 +29,11 @@ defmodule Discovery.UserControllerTest do
   test "GET /Users/new", %{conn: conn} do
       conn = get conn, "/users/new"
       assert html_response(conn, 200) =~ "Get Registered!"
+  end
+
+  @tag login_as: "unittest@unittest.com"
+  test "Get /Users", %{conn: conn, user: user} do
+    conn = get conn, user_path(conn, :index)
+    assert html_response(conn, 200) =~ ~r/Listing users/
   end
 end

@@ -11,12 +11,16 @@ defmodule Discovery.TestHelpers do
 
     %Discovery.User{}
     |> Discovery.User.registration_changeset(changes)
-    |> Discovery.insert!()
+    |> Repo.insert!()
   end
 
   def insert_ticket(user, attrs \\ %{}) do
     user
     |> Ecto.build_assoc(:tickets, attrs)
     |> Repo.insert!()
+  end
+
+  def insert_company() do
+  	
   end
 end
