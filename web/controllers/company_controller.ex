@@ -30,14 +30,8 @@ defmodule Discovery.CompanyController do
     # Original Changeset
     changeset = Company.changeset(%Company{}, company_params)
 
-    # Need to get the company and build association with the user
-    # changeset = 
-    # company
-    # |> build_assoc(:user)
-    # |> Company.changeset(company_params)
-    
     case Repo.insert(changeset) do
-      {:ok, _company} ->
+      {:ok, company} ->
         conn
         |> put_flash(:info, "Company created successfully.")
         |> redirect(to: company_path(conn, :index))

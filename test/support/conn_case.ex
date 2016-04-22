@@ -26,6 +26,7 @@ defmodule Discovery.ConnCase do
       import Ecto.Query, only: [from: 1, from: 2]
 
       import Discovery.Router.Helpers
+      import Discovery.TestHelpers 
 
       # The default endpoint for testing
       @endpoint Discovery.Endpoint

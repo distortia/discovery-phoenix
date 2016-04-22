@@ -2,65 +2,28 @@ defmodule Discovery.TicketControllerTest do
   use Discovery.ConnCase
 
   alias Discovery.Ticket
-  @valid_attrs %{body: "some content", created_on: "2010-04-17 14:00:00", resolution: "some content", severity: [], status: [], tags: [], title: "some content", updated_on: "2010-04-17 14:00:00"}
-  @invalid_attrs %{}
 
-  test "lists all entries on index", %{conn: conn} do
-    conn = get conn, ticket_path(conn, :index)
-    assert html_response(conn, 200) =~ "Listing tickets"
-  end
-
-  test "renders form for new resources", %{conn: conn} do
-    conn = get conn, ticket_path(conn, :new)
-    assert html_response(conn, 200) =~ "New ticket"
-  end
-
-  test "creates resource and redirects when data is valid", %{conn: conn} do
-    conn = post conn, ticket_path(conn, :create), ticket: @valid_attrs
-    assert redirected_to(conn) == ticket_path(conn, :index)
-    assert Repo.get_by(Ticket, @valid_attrs)
-  end
-
-  test "does not create resource and renders errors when data is invalid", %{conn: conn} do
-    conn = post conn, ticket_path(conn, :create), ticket: @invalid_attrs
-    assert html_response(conn, 200) =~ "New ticket"
-  end
-
-  test "shows chosen resource", %{conn: conn} do
-    ticket = Repo.insert! %Ticket{}
-    conn = get conn, ticket_path(conn, :show, ticket)
-    assert html_response(conn, 200) =~ "Show ticket"
-  end
-
-  test "renders page not found when id is nonexistent", %{conn: conn} do
-    assert_error_sent 404, fn ->
-      get conn, ticket_path(conn, :show, -1)
+  setup %{conn: conn} = config do
+    if email = config[:login_as] do
+      user = insert_user(email: "unittest@unittest.com", first_name: "unit", last_name: "test", password: "123123")
+      conn = assign(conn(), :current_user, user)
+      {:ok, conn: conn, user: user}
+    else
+      :ok
     end
   end
 
-  test "renders form for editing chosen resource", %{conn: conn} do
-    ticket = Repo.insert! %Ticket{}
-    conn = get conn, ticket_path(conn, :edit, ticket)
-    assert html_response(conn, 200) =~ "Edit ticket"
-  end
-
-  test "updates chosen resource and redirects when data is valid", %{conn: conn} do
-    ticket = Repo.insert! %Ticket{}
-    conn = put conn, ticket_path(conn, :update, ticket), ticket: @valid_attrs
-    assert redirected_to(conn) == ticket_path(conn, :show, ticket)
-    assert Repo.get_by(Ticket, @valid_attrs)
-  end
-
-  test "does not update chosen resource and renders errors when data is invalid", %{conn: conn} do
-    ticket = Repo.insert! %Ticket{}
-    conn = put conn, ticket_path(conn, :update, ticket), ticket: @invalid_attrs
-    assert html_response(conn, 200) =~ "Edit ticket"
-  end
-
-  test "deletes chosen resource", %{conn: conn} do
-    ticket = Repo.insert! %Ticket{}
-    conn = delete conn, ticket_path(conn, :delete, ticket)
-    assert redirected_to(conn) == ticket_path(conn, :index)
-    refute Repo.get(Ticket, ticket.id)
+  test "Redirect from /tickets to index with error", %{conn: conn} do
+    Enum.each([
+      get(conn, company_path(conn, :index)),
+      get(conn, company_path(conn, :show, "1")),
+      get(conn, company_path(conn, :new)),
+      get(conn, company_path(conn, :edit, "1")),
+      put(conn, company_path(conn, :update, "1", %{})),
+      delete(conn, company_path(conn, :delete, "1")),
+      ], fn conn -> 
+       assert redirected_to(conn, 302) =~ "/sessions/new"
+       assert get_flash(conn, :error) == "Error, You must be logged in to access this page"
+     end)
   end
 end

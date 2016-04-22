@@ -2,65 +2,32 @@ defmodule Discovery.UserControllerTest do
   use Discovery.ConnCase
 
   alias Discovery.User
-  @valid_attrs %{email: "some content", first_name: "some content", last_name: "some content", password: "some content"}
-  @invalid_attrs %{}
 
-  test "lists all entries on index", %{conn: conn} do
-    conn = get conn, user_path(conn, :index)
-    assert html_response(conn, 200) =~ "Listing users"
-  end
-
-  test "renders form for new resources", %{conn: conn} do
-    conn = get conn, user_path(conn, :new)
-    assert html_response(conn, 200) =~ "New user"
-  end
-
-  test "creates resource and redirects when data is valid", %{conn: conn} do
-    conn = post conn, user_path(conn, :create), user: @valid_attrs
-    assert redirected_to(conn) == user_path(conn, :index)
-    assert Repo.get_by(User, @valid_attrs)
-  end
-
-  test "does not create resource and renders errors when data is invalid", %{conn: conn} do
-    conn = post conn, user_path(conn, :create), user: @invalid_attrs
-    assert html_response(conn, 200) =~ "New user"
-  end
-
-  test "shows chosen resource", %{conn: conn} do
-    user = Repo.insert! %User{}
-    conn = get conn, user_path(conn, :show, user)
-    assert html_response(conn, 200) =~ "Show user"
-  end
-
-  test "renders page not found when id is nonexistent", %{conn: conn} do
-    assert_error_sent 404, fn ->
-      get conn, user_path(conn, :show, -1)
+  setup %{conn: conn} = config do
+    if email = config[:login_as] do
+      user = insert_user(email: "unittest@unittest.com", first_name: "unit", last_name: "test", password: "123123")
+      conn = assign(conn(), :current_user, user)
+      {:ok, conn: conn, user: user}
+    else
+      :ok
     end
   end
-
-  test "renders form for editing chosen resource", %{conn: conn} do
-    user = Repo.insert! %User{}
-    conn = get conn, user_path(conn, :edit, user)
-    assert html_response(conn, 200) =~ "Edit user"
+  
+  test "Redirect from /users to index with error due to authentication", %{conn: conn} do
+    Enum.each([
+      get(conn, user_path(conn, :index)),
+      get(conn, user_path(conn, :show, "1")),
+      get(conn, user_path(conn, :edit, "1")),
+      put(conn, user_path(conn, :update, "1", %{})),
+      delete(conn, user_path(conn, :delete, "1")),
+      ], fn conn -> 
+           assert redirected_to(conn, 302) =~ "/sessions/new"
+           assert get_flash(conn, :error) == "Error, You must be logged in to access this page"
+      end)
   end
 
-  test "updates chosen resource and redirects when data is valid", %{conn: conn} do
-    user = Repo.insert! %User{}
-    conn = put conn, user_path(conn, :update, user), user: @valid_attrs
-    assert redirected_to(conn) == user_path(conn, :show, user)
-    assert Repo.get_by(User, @valid_attrs)
-  end
-
-  test "does not update chosen resource and renders errors when data is invalid", %{conn: conn} do
-    user = Repo.insert! %User{}
-    conn = put conn, user_path(conn, :update, user), user: @invalid_attrs
-    assert html_response(conn, 200) =~ "Edit user"
-  end
-
-  test "deletes chosen resource", %{conn: conn} do
-    user = Repo.insert! %User{}
-    conn = delete conn, user_path(conn, :delete, user)
-    assert redirected_to(conn) == user_path(conn, :index)
-    refute Repo.get(User, user.id)
+  test "GET /Users/new", %{conn: conn} do
+      conn = get conn, "/users/new"
+      assert html_response(conn, 200) =~ "Get Registered!"
   end
 end
