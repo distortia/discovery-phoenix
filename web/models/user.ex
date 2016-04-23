@@ -37,6 +37,20 @@ defmodule Discovery.User do
     |> put_pass_hash()
   end
 
+  def update_changeset(model, params) do
+    case params["password"] do
+      "" ->
+        model
+        |> changeset(params)
+      _ ->
+        model
+        |> changeset(params)
+        |> cast(params, ~w(password), [])
+        |> validate_length(:password, min: 6, max: 100)
+        |> put_pass_hash()
+    end
+  end
+
   defp put_pass_hash(changeset) do
     case changeset do
       %Ecto.Changeset{valid?: true, changes: %{password: pass}} ->
