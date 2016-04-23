@@ -12,7 +12,7 @@ defmodule Discovery.Router do
 
   scope "/", Discovery do
     pipe_through :browser # Use the default browser stack
-    get "/email", PageController, :email
+    get "/email/:company", PageController, :email
 
     get "/", PageController, :index
     # Sessions is our login controller
