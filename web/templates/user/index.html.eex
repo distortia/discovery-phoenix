@@ -7,6 +7,7 @@
       <th>Last name</th>
       <th>Email</th>
       <th>Company</th>
+      <th>Role</th>
 
       <th></th>
     </tr>
@@ -23,7 +24,7 @@
         <%= user.company.name %>
       <% end %>
       </td>
-
+      <td><%= user.role %></td>
 
       <td class="text-right">
         <%= link "Show", to: user_path(@conn, :show, user), class: "btn btn-default btn-xs" %>

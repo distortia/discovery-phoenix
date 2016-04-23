@@ -28,6 +28,10 @@
       <%= link "#{@company.name}", to: company_path(@conn, :show, @company.id) %>
     <% end %>
   </li>
+  <li>
+    <strong>Role: </strong>
+    <%= @user.role %>
+  </li>
 </ul>
 
 <%= link "Edit", to: user_path(@conn, :edit, @user) %>
