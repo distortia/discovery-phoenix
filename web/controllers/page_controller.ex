@@ -6,10 +6,11 @@ defmodule Discovery.PageController do
   def index(conn, _params) do
     render conn, "index.html"
   end
-  def email(conn, _params) do
+  def email(conn, _params, company) do
   	Email.welcome_email |> Mailer.deliver_later
   	conn
-  	|> put_flash(:info, "Invitiation sent")
-  	|> render "index.html"
+  	|> put_flash(:info, "Invitiation sent!")
+  	|> IO.inspect()
+  	|> render "show.html", company: company
   end
 end
