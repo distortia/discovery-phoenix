@@ -10,6 +10,7 @@ defmodule Discovery.User do
     field :email, :string
     field :password, :string, virtual: true
     field :password_hash, :string
+    field :role, :string
     
     belongs_to :company, Company
     has_many :tickets, Ticket
@@ -25,7 +26,7 @@ defmodule Discovery.User do
   """
   def changeset(model, params \\ :empty) do
     model
-    |> cast(params, ~w(first_name last_name email), [])
+    |> cast(params, ~w(first_name last_name email role), [])
     |> validate_length(:email, min: 1)
   end
 
