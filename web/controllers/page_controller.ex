@@ -7,9 +7,9 @@ defmodule Discovery.PageController do
     render conn, "index.html"
   end
   def email(conn, _params) do
-  	Email.welcome_email |> Mailer.deliver_now
+  	Email.welcome_email |> Mailer.deliver_later
   	conn
-  	|> put_flash(:info, "Message sent")
+  	|> put_flash(:info, "Invitiation sent")
   	|> render "index.html"
   end
 end

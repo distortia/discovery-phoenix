@@ -8,10 +8,9 @@ defmodule Discovery.Email do
 
   def welcome_email do
     new_email
-    |> to("me@darrellpappa.com.com")
-    |> from("alphaity@alphaity.io")
-    |> subject("Welcome!!!")
-    |> html_body("<strong>Welcome</strong>")
-    |> text_body("welcome")
+    |> to("me@darrellpappa.com")
+    |> from("support@alphaity.io")
+    |> subject("Discovery - Invitation")
+    |> html_body("You have been invited to join \"Company_Name\" in Discovery. Click this link to join!")
   end
 end
