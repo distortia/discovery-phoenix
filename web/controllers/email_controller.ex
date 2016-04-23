@@ -11,7 +11,7 @@ defmodule Discovery.EmailController do
 		|> IO.inspect()
 		# users="me@darrellpappa.com"
 		for user <- users do
-			Email.welcome_email(company, user)
+			Email.invite_email(company, user)
 			|> Mailer.deliver_later()
 		end
 		conn
@@ -24,11 +24,13 @@ end
 defmodule Discovery.Email do
   import Bamboo.Email
 
-  def welcome_email(company, user) do
+  def invite_email(company, user) do
     new_email
     |> to(user)
     |> from("support@alphaity.io")
     |> subject("Discovery - Invitation")
-    |> html_body("You have been invited to join the company #{String.upcase(company.name)} in Discovery. Click this link to join!")
+    |> html_body(
+    	"You have been invited to join the company #{String.upcase(company.name)} in Discovery.
+     	Click this link to join: ")
   end
 end
