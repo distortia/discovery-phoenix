@@ -38,8 +38,6 @@ defmodule Discovery.User do
   end
 
   def update_changeset(model, params) do
-    IO.puts("HESIRSOERHIU")
-    IO.inspect(params["password"])
     case params["password"] do
       "" ->
         model
