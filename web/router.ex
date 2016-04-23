@@ -39,7 +39,7 @@ defmodule Discovery.Router do
 scope "/", Discovery do
   pipe_through [:browser, :authenticate_user]
 
-  get "/invite/:company", EmailController, :invite # Sends email for invitation
+  post "/invite/:company", EmailController, :invite # Sends email for invitation
 end
   
   # Tickets router + middleware

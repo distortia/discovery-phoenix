@@ -5,12 +5,12 @@ defmodule Discovery.EmailController do
 	alias Discovery.Mailer
 	alias Discovery.Company
 
-	def invite(conn, %{"company" => company}) do
+	def invite(conn, %{"company" => company}, users) do
 		company = 
 		Repo.get!(Company, company)
 		|> IO.inspect()
-		user="me@darrellpappa.com"
-		Email.welcome_email(company, user)
+		users="me@darrellpappa.com"
+		Email.welcome_email(company, users)
 		|> Mailer.deliver_later()
 
 		conn
