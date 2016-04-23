@@ -12,7 +12,6 @@ defmodule Discovery.Router do
 
   scope "/", Discovery do
     pipe_through :browser # Use the default browser stack
-    get "/email/:company", PageController, :email
 
     get "/", PageController, :index
     # Sessions is our login controller
@@ -35,6 +34,13 @@ defmodule Discovery.Router do
     post "/join", CompanyController, :join_company
     resources "/", CompanyController, except: [:join]
   end
+
+# Random Authenticated Routes
+scope "/", Discovery do
+  pipe_through [:browser, :authenticate_user]
+
+  get "/invite/:company", EmailController, :invite # Sends email for invitation
+end
   
   # Tickets router + middleware
   scope "/tickets", Discovery do
