@@ -5,14 +5,15 @@ defmodule Discovery.EmailController do
 	alias Discovery.Mailer
 	alias Discovery.Company
 
-	def invite(conn, %{"company" => company}, users) do
+	def invite(conn, %{"company" => company, "users" => users}) do
 		company = 
 		Repo.get!(Company, company)
 		|> IO.inspect()
-		users="me@darrellpappa.com"
-		Email.welcome_email(company, users)
-		|> Mailer.deliver_later()
-
+		# users="me@darrellpappa.com"
+		for user <- users do
+			Email.welcome_email(company, user)
+			|> Mailer.deliver_later()
+		end
 		conn
 		|> put_flash(:info, "Invitiation sent!")
 		|> redirect(to: company_path(conn, :show, company.id))
@@ -28,6 +29,6 @@ defmodule Discovery.Email do
     |> to(user)
     |> from("support@alphaity.io")
     |> subject("Discovery - Invitation")
-    |> html_body("You have been invited to join #{company.name}in Discovery. Click this link to join!")
+    |> html_body("You have been invited to join the company #{String.upcase(company.name)} in Discovery. Click this link to join!")
   end
 end
