@@ -1,4 +1,6 @@
 {
+  "name":"Discovery",
+  "version":"0.0.1",
   "repository": {},
   "dependencies": {
     "babel-brunch": "~6.0.0",
