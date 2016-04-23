@@ -55,26 +55,34 @@ defmodule Discovery.UserController do
   end
 
   def edit(conn, %{"id" => id}) do
-    case self_access_only(conn, id) do
-      {:ok, conn} -> 
+    cond do
+      self_access_only(conn, id) == {:ok, conn} or admin_access_only(conn, id) == {:ok, conn} ->
         user = Repo.get!(User, id)
         changeset = User.changeset(user)
-        render(conn, "edit.html", user: user, changeset: changeset)
-      {:error, conn} -> 
+        currentUser = Repo.get!(User, conn.assigns.current_user.id)
+        render(conn, "edit.html", user: user, changeset: changeset, currentUser: currentUser)
+      true ->
         conn
-        |> put_flash(:error, "Error, You do not have access this page")
-        |> redirect(to: user_path(conn, :index))
-        |> halt()
+          |> put_flash(:error, "Error, You do not have access this page")
+          |> redirect(to: user_path(conn, :index))
+          |> halt()
     end
-
   end
 
   def update(conn, %{"id" => id, "user" => user_params}) do
-    case self_access_only(conn, id) do
-      {:ok, conn} ->
+    cond do
+      self_access_only(conn, id) == {:ok, conn} or admin_access_only(conn, id) == {:ok, conn} ->
         user = Repo.get!(User, id)
+        # If the user is going to assign a new owner, change their current role to an admin
+        if user_params["role"] == "Owner" do
+          if change_owner(conn) == {:error, conn} do
+            conn
+             |> put_flash(:error, "Error Updating User")
+             |> redirect(to: user_path(conn, :index))
+             |> halt()
+          end
+        end
         changeset = User.update_changeset(user, user_params)
-
         case Repo.update(changeset) do
           {:ok, user} ->
             conn
@@ -83,17 +91,17 @@ defmodule Discovery.UserController do
           {:error, changeset} ->
             render(conn, "edit.html", user: user, changeset: changeset)
         end
-      {:error, conn} -> 
+      true ->
         conn
-        |> put_flash(:error, "Error, You do not have access this page")
-        |> redirect(to: user_path(conn, :index))
-        |> halt()
+          |> put_flash(:error, "Error, You do not have access this page")
+          |> redirect(to: user_path(conn, :index))
+          |> halt()
     end
   end
 
   def delete(conn, %{"id" => id}) do
-    case self_access_only(conn, id) do
-      {:ok, conn} ->
+    cond do
+      self_access_only(conn, id) == {:ok, conn} or admin_access_only(conn, id) == {:ok, conn} ->
         user = Repo.get!(User, id)
 
         # Here we use delete! (with a bang) because we expect
@@ -103,11 +111,11 @@ defmodule Discovery.UserController do
         conn
         |> put_flash(:info, "User deleted successfully.")
         |> redirect(to: user_path(conn, :index))
-      {:error, conn} ->
+      true ->
         conn
-        |> put_flash(:error, "Error, You do not have access this page")
-        |> redirect(to: user_path(conn, :index))
-        |> halt()
+         |> put_flash(:error, "Error, You do not have access to delete")
+         |> redirect(to: user_path(conn, :index))
+         |> halt()
     end
   end
 
@@ -120,4 +128,25 @@ defmodule Discovery.UserController do
       {:error, conn}
     end
   end
+
+  # This checks if the user is an admin or an owner
+  def admin_access_only(conn, id) do
+    user = Repo.get!(User, conn.assigns.current_user.id)
+    otherUser = Repo.get!(User, id)
+    cond do
+      (user.role == "Admin" and otherUser.role != "Owner") or user.role == "Owner" -> {:ok, conn}
+      true -> {:error, conn}
+    end
+  end
+
+  def change_owner(conn) do
+    this_user = Repo.get!(User, conn.assigns.current_user.id)
+    this_user_params = %{"role" => "Admin"}
+    changeset = User.update_owner_changeset(this_user, this_user_params)
+    case Repo.update(changeset) do
+      {:ok, user} -> {:ok, user}
+      {:error, changeset} -> {:error, conn}
+    end
+  end
+
 end

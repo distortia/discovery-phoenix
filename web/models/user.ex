@@ -52,6 +52,11 @@ defmodule Discovery.User do
     end
   end
 
+  def update_owner_changeset(model, params) do
+     model
+     |> cast(params, ~w(role), [])
+  end
+  
   defp put_pass_hash(changeset) do
     case changeset do
       %Ecto.Changeset{valid?: true, changes: %{password: pass}} ->
