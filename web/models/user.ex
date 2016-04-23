@@ -10,6 +10,7 @@ defmodule Discovery.User do
     field :email, :string
     field :password, :string, virtual: true
     field :password_hash, :string
+    field :role, :string
     
     belongs_to :company, Company
     has_many :tickets, Ticket
@@ -25,7 +26,7 @@ defmodule Discovery.User do
   """
   def changeset(model, params \\ :empty) do
     model
-    |> cast(params, ~w(first_name last_name email), [])
+    |> cast(params, ~w(first_name last_name email role), [])
     |> validate_length(:email, min: 1)
   end
 
@@ -35,6 +36,20 @@ defmodule Discovery.User do
     |> cast(params, ~w(password), [])
     |> validate_length(:password, min: 6, max: 100)
     |> put_pass_hash()
+  end
+
+  def update_changeset(model, params) do
+    case params["password"] do
+      "" ->
+        model
+        |> changeset(params)
+      _ ->
+        model
+        |> changeset(params)
+        |> cast(params, ~w(password), [])
+        |> validate_length(:password, min: 6, max: 100)
+        |> put_pass_hash()
+    end
   end
 
   defp put_pass_hash(changeset) do
