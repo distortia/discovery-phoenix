@@ -103,14 +103,19 @@ defmodule Discovery.UserController do
     cond do
       self_access_only(conn, id) == {:ok, conn} or admin_access_only(conn, id) == {:ok, conn} ->
         user = Repo.get!(User, id)
-
-        # Here we use delete! (with a bang) because we expect
-        # it to always work (and if it does not, it will raise).
-        Repo.delete!(user)
-
-        conn
-        |> put_flash(:info, "User deleted successfully.")
-        |> redirect(to: user_path(conn, :index))
+        tickets = Repo.all(assoc(user, :tickets))
+        case length(tickets) do
+          0 ->
+            Repo.delete!(user)
+            conn
+            |> put_flash(:info, "User deleted successfully.")
+            |> redirect(to: user_path(conn, :index))
+          _ ->
+            conn
+             |> put_flash(:error, "Please re-assign all tickets from this user before deleting")
+             |> redirect(to: user_path(conn, :index))
+             |> halt()
+        end
       true ->
         conn
          |> put_flash(:error, "Error, You do not have access to delete")
