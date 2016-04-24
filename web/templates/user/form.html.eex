@@ -30,9 +30,22 @@
   </div>
 
   <div class="form-group">
-    <%= label f, :role, class: "control-label" %>
-    <%= text_input f, :role, class: "form-control" %>
-    <%= error_tag f, :role %>
+    <%= if assigns[:currentUser] do %>
+      <%= if @currentUser.role == "Owner" do %>
+        <%= label f, :role, class: "control-label" %>
+        <%= select f, :role, ["User","Admin","Owner"], class: "form-control" %>
+        <%= error_tag f, :role %>      
+      <% end %>
+      <%= if @currentUser.role  == "Admin" do %>
+        <%= label f, :role, class: "control-label" %>
+        <%= select f, :role, ["User","Admin"], class: "form-control" %>
+        <%= error_tag f, :role %>      
+      <% end %>
+    <%= else %>
+        <%= label f, :role, class: "control-label" %>
+        <%= select f, :role, ["User","Admin","Owner"], class: "form-control" %>
+        <%= error_tag f, :role %>
+    <%= end %>
   </div>
 
   <div class="form-group">
