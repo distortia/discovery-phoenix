@@ -17,7 +17,8 @@ defmodule Discovery.Router do
     # Sessions is our login controller
     resources "/sessions", SessionController, only: [:new, :create, :delete]
     # Keep the ability to register open
-    resources "/users", UserController, only: [:new, :create]
+    get "/users/new/:unique_company_id", UserController, :join
+    post "/users", UserController, :new
   end
 
   # Added scope to the routes for the authentication middleware

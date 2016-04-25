@@ -43,9 +43,10 @@
 			</div>
 			<div class="modal-body">	
 			<%= form_for @conn, email_path(@conn, :invite, @company), [as: :users], fn f -> %>
-				<label>
-					Email: <%= text_input f, :email, placeholder: "Email Address" %>
-				</label>
+				<div class="form-group">
+					<label for="users_email">Email Address</label>
+						<%= text_input f, :email, placeholder: "Email addresses seperated by a comma ", style: "width:100%" %>
+				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
 					<%= submit "Invite!", class: "btn btn-primary" %>

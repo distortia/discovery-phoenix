@@ -35,6 +35,8 @@
     <%= error_tag f, :role %>
   </div>
 
+  <%= text_input f, :unique_company_id, value: @unique_company_id %>
+
   <div class="form-group">
     <%= submit "Submit", class: "btn btn-primary" %>
   </div>

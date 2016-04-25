@@ -6,6 +6,7 @@ defmodule Discovery.Company do
 
   schema "companies" do
     field :name, :string
+    # field :unique_id, :string
     
     has_many :users, User
     # Sets up the user ticket company relationship

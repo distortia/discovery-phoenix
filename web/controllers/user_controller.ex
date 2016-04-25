@@ -111,6 +111,11 @@ defmodule Discovery.UserController do
     end
   end
 
+  def join(conn, %{"unique_company_id" => unique_company_id}) do
+    changeset = User.changeset(%User{})
+    render(conn, "new.html", unique_company_id: unique_company_id, changeset: changeset)
+  end
+
   # This only allows the specific user access to updated/delete their profile
   def self_access_only(conn, id) do
     # Compare the current user to the id from the path
