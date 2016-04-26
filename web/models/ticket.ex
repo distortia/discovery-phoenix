@@ -9,7 +9,7 @@ defmodule Discovery.Ticket do
     field :body, :string
     field :resolution, :string
     field :created_on, :string
-    field :severity, {:array, :integer}
+    field :severity, :string, default: "Normal"
     field :updated_on, :string
     field :tags, {:array, :string}
     field :status, :string, default: "Open"
@@ -22,7 +22,7 @@ defmodule Discovery.Ticket do
   end
 
   @required_fields ~w(title body)
-  @optional_fields ~w(resolution tags status)
+  @optional_fields ~w(resolution tags status severity)
 
   @doc """
   Creates a changeset based on the `model` and `params`.

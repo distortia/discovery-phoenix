@@ -18,6 +18,12 @@
   </div>
 
   <div class="form-group">
+    <%= label f, :severity, class: "control-label" %>
+    <%= select f, :severity, ["Low","Normal","High"], class: "form-control" %>
+    <%= error_tag f, :severity %>
+  </div>
+  
+  <div class="form-group">
     <%= label f, :resolution, class: "control-label" %>
     <%= textarea f, :resolution, class: "form-control" %>
     <%= error_tag f, :resolution %>
@@ -28,7 +34,7 @@
     <%= select f, :status, ["Open","In Progress","Closed","Waiting For Action
 ", "Non-Issue", "Suspended"], class: "form-control" %>
     <%= error_tag f, :status %>
-  </div>
+  </div>  
 
   <div class="form-group">
     <%= submit "Submit", class: "btn btn-primary" %>

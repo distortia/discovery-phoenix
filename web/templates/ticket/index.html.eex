@@ -10,6 +10,7 @@
       <th>Assigned to</th>
       <th>Created by</th>
       <th>Status</th>
+      <th>Severity</th>
       <th></th>
     </tr>
   </thead>
@@ -22,6 +23,7 @@
       <td><%=# ticket.assigned_to %></td>
       <td><%= ticket.created_by %></td>
       <td><%= ticket.status%></td>
+      <td><%= ticket.severity%></td>
       <td class="text-right">
         <%= link "Show", to: ticket_path(@conn, :show, ticket), class: "btn btn-default btn-xs" %>
         <%= link "Edit", to: ticket_path(@conn, :edit, ticket), class: "btn btn-default btn-xs" %>
