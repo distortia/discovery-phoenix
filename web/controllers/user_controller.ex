@@ -128,7 +128,7 @@ defmodule Discovery.UserController do
     render(conn, "reset.html")
   end
 
-  def new_password(conn, %{"random_auth_id" => random_auth_id}) do
+  def new_password(conn, %{"auth_id" => auth_id}) do
     
   end
 end

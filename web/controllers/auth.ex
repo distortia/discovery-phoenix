@@ -45,20 +45,7 @@ defmodule Discovery.Auth do
 				{:error, :not_found, conn}
 		end
 	end
-
-	def random_auth_id(user) do
-		# generate random auth id
-		auth_id = "123"	
-		# get the user
-		user = Repo.get!(User, user.id)
-		# add the auth id to the user
-		user.auth_id = auth_id
-		# insert into database
-		Repo.insert!(User, user)
-		# return the auth id
-		auth_id
-	end
-
+	
 	import Phoenix.Controller
 	alias Discovery.Router.Helpers
 
