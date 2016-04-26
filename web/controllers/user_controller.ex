@@ -101,6 +101,33 @@ defmodule Discovery.UserController do
     end
   end
 
+  def reset(conn, _params) do
+    render(conn, "reset.html")
+  end
+
+  def new_password(conn, %{"auth_id" => auth_id}) do
+    render(conn, "update.html", auth_id: auth_id)
+  end
+
+  def update_password(conn, %{"update_form" => update_params}) do
+    # find user by auth_id
+    user = Repo.get_by(User, auth_id: update_params["auth_id"])
+    # Pass the password to the update_changeset
+    |> User.update_changeset(update_params)
+    #update the user with the new password
+    case Repo.update(user) do
+      {:ok, user} ->
+        # Remove the auth_id
+        
+        Repo.update(Ecto.Changeset.change(user, auth_id: ""))
+        conn
+        |> put_flash(:info, "Password updated successfully.")
+        |> redirect(to: ticket_path(conn, :index))
+      {:error, changeset} ->
+        render(conn, "update.html", auth_id: update_params["auth_id"], changeset: changeset)
+    end
+  end
+
   #Plug used to determine if the user has access to do an action within the User model space
   def access_user(conn, _options) do
     otherUser = Repo.get!(User, conn.params["id"])
@@ -122,13 +149,5 @@ defmodule Discovery.UserController do
       {:ok, user} -> {:ok, user}
       {:error, changeset} -> {:error, conn}
     end
-  end
-
-  def reset(conn, _params) do
-    render(conn, "reset.html")
-  end
-
-  def new_password(conn, %{"auth_id" => auth_id}) do
-    
   end
 end

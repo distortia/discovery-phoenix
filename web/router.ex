@@ -17,8 +17,9 @@ defmodule Discovery.Router do
     # Password Reset
     get "/users/reset", UserController, :reset
     post "/users/reset", EmailController, :reset
-    get "/users/password", UserController, :new_password
-    # Sessions is our login controller
+    get "/users/reset/:auth_id", UserController, :new_password
+    post "/users/reset/update", UserController, :update_password
+    # Sessions is our login controller:o
     resources "/sessions", SessionController, only: [:new, :create, :delete]
     # Keep the ability to register open
     resources "/users", UserController, only: [:new, :create]
