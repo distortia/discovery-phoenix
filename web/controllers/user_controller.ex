@@ -2,6 +2,7 @@ defmodule Discovery.UserController do
   use Discovery.Web, :controller
 
   alias Discovery.User
+  alias Discovery.Company
 
   plug :authenticate_user when action in [:index, :show]
 
@@ -20,13 +21,13 @@ defmodule Discovery.UserController do
 
   def create(conn, %{"user" => user_params}) do
     changeset = User.registration_changeset(%User{}, user_params)
-
+    company = Repo.get!(Company, user_params["unique_company_id"])
     case Repo.insert(changeset) do
       {:ok, user} ->
         conn
         |> Discovery.Auth.login(user)
         |> put_flash(:info, "Welcome #{user.first_name} #{user.last_name}!")
-        |> redirect(to: company_path(conn, :new))
+        |> redirect(to: company_path(conn, :join_company, company: company))
       {:error, changeset} ->
         render(conn, "new.html", changeset: changeset)
     end
