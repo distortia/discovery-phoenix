@@ -8,8 +8,8 @@ defmodule Discovery.EmailController do
 	def invite(conn, %{"company" => company, "users" => users}) do
 		
 		company = Repo.get!(Company, company)
-		# link = company.unique_link
-		link = "http://discovery.bluegatr.com/users/new/1"
+		link = "http://localhost:4000/users/new/#{company.id}"
+		
 		users["email"]
 		|> String.split(",")
 		|> Enum.each(fn(email) -> 
