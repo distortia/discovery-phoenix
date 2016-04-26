@@ -7,7 +7,7 @@ defmodule Discovery.User do
   schema "users" do
     field :first_name, :string
     field :last_name, :string
-    field :email, :string
+    field :email, :string, unique: true
     field :password, :string, virtual: true
     field :password_hash, :string
     field :role, :string
@@ -27,7 +27,9 @@ defmodule Discovery.User do
   def changeset(model, params \\ :empty) do
     model
     |> cast(params, ~w(first_name last_name email role), [])
+    |> unique_constraint(:email)
     |> validate_length(:email, min: 1)
+    |> update_change(:email, &String.downcase/1) # Normalize all emails
   end
 
   def registration_changeset(model, params) do
