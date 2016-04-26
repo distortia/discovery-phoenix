@@ -36,7 +36,6 @@
               <li><%= link "Company", to: company_path(@conn, :index) %></li>
               <li><%= link "Log Out", to: session_path(@conn, :delete, @current_user), method: "delete" %></li>
             <% else %>
-              <li><%= link "Register", to: user_path(@conn, :new) %></li>
               <li><%= link "Log In", to: session_path(@conn, :new) %></li>
             <% end %>
           </ol>
