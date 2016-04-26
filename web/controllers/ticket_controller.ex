@@ -43,6 +43,7 @@ defmodule Discovery.TicketController do
     |> Ecto.Changeset.put_change(:created_on, "#{Ecto.DateTime.utc}")
     |> Ecto.Changeset.put_change(:updated_on, "#{Ecto.DateTime.utc}")
     |> Ecto.Changeset.put_change(:created_by, "#{user.first_name} #{user.last_name}")
+    |> Ecto.Changeset.put_change(:assigned_to, ticket_params["assigned_to"])
     
     case Repo.insert(changeset) do
       {:ok, _ticket} ->
@@ -97,5 +98,9 @@ defmodule Discovery.TicketController do
   # Function to look up tickets for the given user
   defp user_tickets(user) do
     assoc(user, :tickets)
+  end
+
+  defp company_users(company) do
+    assoc(company, :users)
   end
 end

@@ -14,6 +14,7 @@ defmodule Discovery.Ticket do
     field :tags, {:array, :string}
     field :status, :string, default: "Open"
     field :created_by, :string
+    field :assigned_to, :string
 
     # Set relationship to user
     belongs_to :user, User
