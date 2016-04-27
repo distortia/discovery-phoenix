@@ -45,7 +45,7 @@ defmodule Discovery.Auth do
 				{:error, :not_found, conn}
 		end
 	end
-
+	
 	import Phoenix.Controller
 	alias Discovery.Router.Helpers
 

@@ -14,7 +14,12 @@ defmodule Discovery.Router do
     pipe_through :browser # Use the default browser stack
 
     get "/", PageController, :index
-    # Sessions is our login controller
+    # Password Reset
+    get "/users/reset", UserController, :reset
+    post "/users/reset", EmailController, :reset
+    get "/users/reset/:auth_id", UserController, :new_password
+    post "/users/reset/update", UserController, :update_password
+    # Sessions is our login controller:o
     resources "/sessions", SessionController, only: [:new, :create, :delete]
     # Keep the ability to register open
     resources "/users", UserController, only: [:new, :create]

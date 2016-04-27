@@ -1,0 +1,14 @@
+<h2>Reset Password</h2>
+
+<p>Please enter your email address to reset your password</p>
+<%= form_for @conn, email_path(@conn, :reset), [as: :reset_form], fn f -> %>
+	<div class="form-group">
+		<label>
+			Email: <%= email_input f, :email, placeholder: "Email" %>
+		</label>
+	</div>
+
+  <div class="form-group">
+    <%= submit "Submit", class: "btn btn-primary" %>
+  </div>
+<% end %>
