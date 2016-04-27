@@ -25,7 +25,7 @@
 
   <div class="form-group">
     <%= label f, :assigned_to, class: "control-label" %>
-    <%= select f, :assigned_to, [""], class: "form-control" %>
+    <%= select f, :assigned_to, @users, class: "form-control", prompt: "Assign to a user"%>
     <%= error_tag f, :assigned_to %>
   </div>
   

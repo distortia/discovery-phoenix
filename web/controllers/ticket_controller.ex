@@ -2,6 +2,8 @@ defmodule Discovery.TicketController do
   use Discovery.Web, :controller
 
   alias Discovery.Ticket
+  alias Discovery.Company
+  alias Discovery.User
 
   plug :scrub_params, "ticket" when action in [:create, :update]
 
@@ -25,11 +27,20 @@ defmodule Discovery.TicketController do
   # Then validating the ticket changeset to make sure the form
   # is filled in properly
   def new(conn, _params, user) do
+    # Get the company
+    users = 
+    Repo.get!(Company, user.company_id)
+    |> company_users()
+    |> Repo.all()
+    # The select list on the form requires a list of tuples
+    # Ex. [{"nick stalter", 1}, {"darrell pappa", 2}]
+    |> Map.new(fn(user) -> {user.first_name <> " " <> user.last_name, user.id} end)
+
     changeset = 
     user
     |> build_assoc(:tickets)
     |> Ticket.changeset()
-    render(conn, "new.html", changeset: changeset)
+    render(conn, "new.html", changeset: changeset, users: users)
   end
 
   # We pass in the user as a param of the new ticket process
