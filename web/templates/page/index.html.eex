@@ -24,10 +24,7 @@
 
     <% else %>
     <h4>Registration/Login</h4>
-    <ul>
-      <li>
-        <a href="<%= user_path @conn, :new %>">Register</a>
-      </li>     
+    <ul>   
       <li>
         <a href="<%= session_path(@conn, :new) %>">Login</a>
       </li>

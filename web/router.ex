@@ -22,7 +22,8 @@ defmodule Discovery.Router do
     # Sessions is our login controller:o
     resources "/sessions", SessionController, only: [:new, :create, :delete]
     # Keep the ability to register open
-    resources "/users", UserController, only: [:new, :create]
+    resources "/users", UserController, only: [:create, :new]
+    get "/users/new/:unique_company_id", UserController, :new
   end
 
   # Added scope to the routes for the authentication middleware
@@ -35,8 +36,8 @@ defmodule Discovery.Router do
   # Companies router + middleware
   scope "/companies", Discovery do
     pipe_through [:browser, :authenticate_user]
-    get "/join", CompanyController, :join
-    post "/join", CompanyController, :join_company
+    # get "/join", CompanyController, :join
+    get "/join", CompanyController, :join_company
     resources "/", CompanyController, except: [:join]
   end
 
@@ -44,7 +45,7 @@ defmodule Discovery.Router do
 scope "/", Discovery do
   pipe_through [:browser, :authenticate_user]
 
-  get "/invite/:company", EmailController, :invite # Sends email for invitation
+  post "/invite/:company", EmailController, :invite # Sends email for invitation
 end
   
   # Tickets router + middleware

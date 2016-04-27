@@ -1,6 +1,6 @@
 <h2>Get Registered!</h2>
 
-<%= render "form.html", changeset: @changeset,
+<%= render "form.html", changeset: @changeset, unique_company_id: @unique_company_id,
                         action: user_path(@conn, :create) %>
 
 <%= link "Login", to: session_path(@conn, :new) %>

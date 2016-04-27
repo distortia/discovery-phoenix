@@ -6,13 +6,17 @@ defmodule Discovery.EmailController do
 	alias Discovery.Company
 	alias Discovery.User
 
-	def invite(conn, %{"company" => company}) do
-		company = 
-		Repo.get!(Company, company)
-		|> IO.inspect()
-		user="me@darrellpappa.com"
-		Email.welcome_email(company, user)
-		|> Mailer.deliver_later()
+	def invite(conn, %{"company" => company, "users" => users}) do
+		
+		company = Repo.get!(Company, company)
+		link = "http://localhost:4000/users/new/#{company.id}"
+		
+		users["email"]
+		|> String.split(",")
+		|> Enum.each(fn(email) -> 
+			Email.invite_email(company, email, link)
+			|> Mailer.deliver_later()
+		end)
 
 		conn
 		|> put_flash(:info, "Invitiation sent!")
@@ -58,12 +62,14 @@ end
 defmodule Discovery.Email do
   import Bamboo.Email
 
-  def welcome_email(company, user) do
+  def invite_email(company, email, link) do
     new_email
-    |> to(user)
+    |> to(email)
     |> from("support@alphaity.io")
     |> subject("Discovery - Invitation")
-    |> html_body("You have been invited to join #{company.name}in Discovery. Click this link to join!")
+    |> html_body(
+    	"You have been invited to join the company #{String.upcase(company.name)} in Discovery.
+     	Click this link to join: #{link} ")
   end
 
 	def reset_password_email(email, link) do
