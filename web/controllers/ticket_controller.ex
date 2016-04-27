@@ -28,19 +28,11 @@ defmodule Discovery.TicketController do
   # is filled in properly
   def new(conn, _params, user) do
     # Get the company
-    users = 
-    Repo.get!(Company, user.company_id)
-    |> company_users()
-    |> Repo.all()
-    # The select list on the form requires a list of tuples
-    # Ex. [{"nick stalter", 1}, {"darrell pappa", 2}]
-    |> Map.new(fn(user) -> {user.first_name <> " " <> user.last_name, user.id} end)
-
     changeset = 
     user
     |> build_assoc(:tickets)
     |> Ticket.changeset()
-    render(conn, "new.html", changeset: changeset, users: users)
+    render(conn, "new.html", changeset: changeset, users: get_users_from_user_company(user.company_id))
   end
 
   # We pass in the user as a param of the new ticket process
@@ -54,7 +46,7 @@ defmodule Discovery.TicketController do
     |> Ecto.Changeset.put_change(:created_on, "#{Ecto.DateTime.utc}")
     |> Ecto.Changeset.put_change(:updated_on, "#{Ecto.DateTime.utc}")
     |> Ecto.Changeset.put_change(:created_by, "#{user.first_name} #{user.last_name}")
-    |> Ecto.Changeset.put_change(:assigned_to, ticket_params["assigned_to"])
+    |> Ecto.Changeset.put_change(:assigned_to_name,  user_full_name(ticket_params["assigned_to"]))
     
     case Repo.insert(changeset) do
       {:ok, _ticket} ->
@@ -62,7 +54,7 @@ defmodule Discovery.TicketController do
         |> put_flash(:info, "Ticket created successfully")
         |> redirect(to: ticket_path(conn, :index))
       {:error, changeset} -> 
-        render(conn, "new.html", changeset: changeset)
+        render(conn, "new.html", changeset: changeset, users: get_users_from_user_company(user.company_id))
     end
   end
   # We pass in the user as a param of the show page
@@ -78,15 +70,17 @@ defmodule Discovery.TicketController do
   def edit(conn, %{"id" => id}, user) do
     ticket = Repo.get!(user_tickets(user), id)
     changeset = Ticket.changeset(ticket)
-    render(conn, "edit.html", ticket: ticket, changeset: changeset)
+    render(conn, "edit.html", ticket: ticket, changeset: changeset, users: get_users_from_user_company(user.company_id))
   end
 
   # Same deal as Discovery.Ticket.Create/3
   def update(conn, %{"id" => id, "ticket" => ticket_params}, user) do
+
     ticket = Repo.get!(user_tickets(user), id)
     changeset = 
       Ticket.changeset(ticket, ticket_params)
       |> Ecto.Changeset.put_change(:updated_on, "#{Ecto.DateTime.utc}")
+      |> Ecto.Changeset.put_change(:assigned_to_name, user_full_name(ticket_params["assigned_to"]))
 
     case Repo.update(changeset) do
       {:ok, _ticket} ->
@@ -106,6 +100,22 @@ defmodule Discovery.TicketController do
     |> put_flash(:info, "Ticket Deleted!")
     |> redirect(to: ticket_path(conn, :index))
   end
+
+  defp get_users_from_user_company(company_id) do
+    Repo.get!(Company, company_id)
+    |> company_users()
+    |> Repo.all()
+    # The select list on the form requires a list of tuples
+    # Ex. [{"nick stalter", 1}, {"darrell pappa", 2}]
+    |> Map.new(fn(user) -> {user.first_name <> " " <> user.last_name, user.id} end)
+  end
+
+  # Returns a string of the first name and last name of the given user id
+  defp user_full_name(user_id) do
+    name = Repo.get!(User, user_id)
+    name = name.first_name <> " " <> name.last_name
+  end
+
   # Function to look up tickets for the given user
   defp user_tickets(user) do
     assoc(user, :tickets)

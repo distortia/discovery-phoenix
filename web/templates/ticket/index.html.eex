@@ -20,7 +20,7 @@
       <td><%= ticket.title %></td>
       <td><%= ticket.created_on %></td>
       <td><%= ticket.updated_on %></td>
-      <td><%=# ticket.assigned_to %></td>
+      <td><%= ticket.assigned_to_name %></td>
       <td><%= ticket.created_by %></td>
       <td><%= ticket.status%></td>
       <td><%= ticket.severity%></td>

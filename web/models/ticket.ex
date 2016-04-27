@@ -15,6 +15,7 @@ defmodule Discovery.Ticket do
     field :status, :string, default: "Open"
     field :created_by, :string
     field :assigned_to, :string
+    field :assigned_to_name, :string
 
     # Set relationship to user
     belongs_to :user, User
@@ -22,8 +23,8 @@ defmodule Discovery.Ticket do
     timestamps
   end
 
-  @required_fields ~w(title body)
-  @optional_fields ~w(resolution tags status severity)
+  @required_fields ~w(title body assigned_to)
+  @optional_fields ~w(resolution tags status severity assigned_to_name)
 
   @doc """
   Creates a changeset based on the `model` and `params`.
