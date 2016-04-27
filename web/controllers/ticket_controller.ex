@@ -40,7 +40,7 @@ defmodule Discovery.TicketController do
   # http://stackoverflow.com/questions/33027873/phoenix-framework-how-to-set-default-values-in-ecto-model
   def create(conn, %{"ticket" => ticket_params}, user) do
     changeset =
-    user
+    Repo.get!(User, ticket_params["assigned_to"])
     |> build_assoc(:tickets)
     |> Ticket.changeset(ticket_params)
     |> Ecto.Changeset.put_change(:created_on, "#{Ecto.DateTime.utc}")
