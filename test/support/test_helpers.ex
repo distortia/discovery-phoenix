@@ -7,6 +7,7 @@ defmodule Discovery.TestHelpers do
       last_name: "Test",
       email: "#{Base.encode16(:crypto.rand_bytes(8))}@unittest.com",
       password: "123123",
+      role: "User"
     }, attrs)
 
     %Discovery.User{}

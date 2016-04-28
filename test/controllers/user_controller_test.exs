@@ -13,6 +13,9 @@ defmodule Discovery.UserControllerTest do
     end
   end
 
+  @valid_attrs %{first_name: "Test", last_name: "User", email: "testuser@test.com", password: "123123", role: "User"}
+  @invalid_attrs %{first_name: "invalid"}
+
   test "Redirect from /users to index with error due to authentication", %{conn: conn} do
     Enum.each([
       get(conn, user_path(conn, :index)),
@@ -28,7 +31,24 @@ defmodule Discovery.UserControllerTest do
 
   test "GET /Users/new", %{conn: conn} do
       conn = get conn, "/users/new"
-      assert html_response(conn, 200) =~ "Get Registered!"
+      assert redirected_to(conn, 302) =~ "/"
+      assert get_flash(conn, :error) == "You must be invited before you can create an account. Please contact support or your organizational leader for help"
+  end
+
+  @tag login_as: "unittest@unittest.com"
+  test "Cannot create a user while logged in", %{conn: conn, user: user} do
+    #TODO: Check if we are logged in
+    # conn = post conn, user_path(conn, :create), user: @valid_attrs
+  end
+  
+  test "Create user view", %{conn: conn} do
+    conn = get conn, "/users/new/1"
+    assert html_response(conn, 200) =~ ~r/Get Registered!/
+  end 
+
+  test "Create user without a token throws and error", %{conn: conn} do
+    #TODO: Add the company token as a valid attr when
+    # conn = post conn, user_path(conn, :create), user: @valid_attrs
   end
 
   @tag login_as: "unittest@unittest.com"
