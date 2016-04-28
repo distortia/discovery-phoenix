@@ -59,4 +59,14 @@ defmodule Discovery.Auth do
 			|> halt()
 		end
 	end
+	# Locks down functionality that logged in users should access i.e. Registration
+	def authenticated_not_allowed(conn, _opts) do
+		if conn.assigns.current_user do
+			conn
+			|> redirect(to: Helpers.ticket_path(conn, :index))
+			|> halt()
+		else
+			conn
+		end
+	end
 end
