@@ -12,7 +12,5 @@
             <%= submit "Log in", class: "btn btn-login" %>
         <% end %>
     </div>
-    <%= link "Register", to: user_path(@conn, :new) %>
-    <br>
     <%= link "Forgot Password", to: user_path(@conn, :reset) %>
 </div>

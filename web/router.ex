@@ -14,16 +14,23 @@ defmodule Discovery.Router do
     pipe_through :browser # Use the default browser stack
 
     get "/", PageController, :index
-    # Password Reset
-    get "/users/reset", UserController, :reset
-    post "/users/reset", EmailController, :reset
-    get "/users/reset/:auth_id", UserController, :new_password
-    post "/users/reset/update", UserController, :update_password
     # Sessions is our login controller:o
     resources "/sessions", SessionController, only: [:new, :create, :delete]
-    # Keep the ability to register open
-    resources "/users", UserController, only: [:create, :new]
-    get "/users/new/:unique_company_id", UserController, :new
+  end
+
+  # Unauthenticated user actions
+  scope "/users", Discovery do
+    pipe_through [:browser]
+
+    # Password Reset
+    get "/reset", UserController, :reset
+    post "/reset", EmailController, :reset
+    get "/reset/:auth_id", UserController, :new_password
+    post "/reset/update", UserController, :update_password
+   
+    get "/new", UserController, :new_redirect
+    get "/new/:unique_company_id", UserController, :new
+    post "/", UserController, :create
   end
 
   # Added scope to the routes for the authentication middleware
