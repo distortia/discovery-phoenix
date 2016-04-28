@@ -18,7 +18,7 @@ defmodule Discovery.TicketController do
   # We find all the tickets for the given user using user_tickets/1
   # Render the ticket index with the tickets for the user
   def index(conn, _params, user) do
-    tickets = Repo.all(user_tickets(user))
+    tickets = Repo.all(get_tickets_assigned_to_user(user))
     render(conn, "index.html", tickets: tickets)
   end
 
@@ -61,27 +61,37 @@ defmodule Discovery.TicketController do
   # We find the specific ticket for the given user using user_tickets/1
   # Render the ticket show view with the ticket specified
   def show(conn, %{"id" => id}, user) do
-    ticket = Repo.get!(user_tickets(user), id)
+    ticket = Repo.get!(get_tickets_assigned_to_user(user), id)
     render(conn, "show.html", ticket: ticket)
   end
   # We pass in the user as a param of the edit page
   # We find the specific ticket for the given user using user_tickets/1
   # Render the ticket edit view with the ticket specified and form changeset
   def edit(conn, %{"id" => id}, user) do
-    ticket = Repo.get!(user_tickets(user), id)
+    ticket = Repo.get!(get_tickets_assigned_to_user(user), id)
     changeset = Ticket.changeset(ticket)
     render(conn, "edit.html", ticket: ticket, changeset: changeset, users: get_users_from_user_company(user.company_id))
   end
 
   # Same deal as Discovery.Ticket.Create/3
   def update(conn, %{"id" => id, "ticket" => ticket_params}, user) do
-
-    ticket = Repo.get!(user_tickets(user), id)
+    ticket = Repo.get!(get_tickets_assigned_to_user(user), id)
     changeset = 
       Ticket.changeset(ticket, ticket_params)
-      |> Ecto.Changeset.put_change(:updated_on, "#{Ecto.DateTime.utc}")
-      |> Ecto.Changeset.put_change(:assigned_to_name, user_full_name(ticket_params["assigned_to"]))
 
+    # Check if the assigned to field was changed so we can change the name
+    case changeset.changes do
+      :assigned_to ->
+        changeset =
+        changeset 
+        |> Ecto.Changeset.put_change(:assigned_to_name, user_full_name(ticket_params["assigned_to"]))
+        |> Ecto.Changeset.put_change(:updated_on, "#{Ecto.DateTime.utc}")
+      _ -> 
+        changeset = 
+        changeset 
+        |> Ecto.Changeset.put_change(:updated_on, "#{Ecto.DateTime.utc}")
+    end
+    
     case Repo.update(changeset) do
       {:ok, _ticket} ->
         conn
@@ -93,7 +103,7 @@ defmodule Discovery.TicketController do
   end
 
   def delete(conn, %{"id" => id}, user) do
-    ticket = Repo.get!(user_tickets(user), id)
+    ticket = Repo.get!(get_tickets_assigned_to_user(user), id)
     Repo.delete!(ticket)
 
     conn
@@ -114,6 +124,11 @@ defmodule Discovery.TicketController do
   defp user_full_name(user_id) do
     name = Repo.get!(User, user_id)
     name = name.first_name <> " " <> name.last_name
+  end
+
+  defp get_tickets_assigned_to_user(user) do
+      query = from t in Ticket,
+      where: t.assigned_to == ^to_string(user.id)
   end
 
   # Function to look up tickets for the given user
