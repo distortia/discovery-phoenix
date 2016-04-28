@@ -22,6 +22,12 @@
     <%= select f, :severity, ["Low","Normal","High"], class: "form-control" %>
     <%= error_tag f, :severity %>
   </div>
+
+  <div class="form-group">
+    <%= label f, :assigned_to, class: "control-label" %>
+    <%= select f, :assigned_to, @users, class: "form-control", prompt: "Assign to a user"%>
+    <%= error_tag f, :assigned_to %>
+  </div>
   
   <div class="form-group">
     <%= label f, :resolution, class: "control-label" %>

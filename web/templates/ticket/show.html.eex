@@ -24,14 +24,9 @@
 
   <li>
     <strong>Assigned to:</strong>
-    <%=# @ticket.assigned_to %>
+    <%= @ticket.assigned_to_name %>
   </li>
-
-  <li>
-    <strong>Company:</strong>
-    <%=# @ticket.company_id %>
-  </li>
-
+  
   <li>
     <strong>Severity:</strong>
     <%= @ticket.severity %>
