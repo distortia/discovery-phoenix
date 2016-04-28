@@ -116,6 +116,7 @@ defmodule Discovery.TicketController do
     |> company_users()
     |> Repo.all()
     # The select list on the form requires a list of tuples
+    # TODO: Replace Map.new with Enum.filter
     # Ex. [{"nick stalter", 1}, {"darrell pappa", 2}]
     |> Map.new(fn(user) -> {user.first_name <> " " <> user.last_name, user.id} end)
   end
