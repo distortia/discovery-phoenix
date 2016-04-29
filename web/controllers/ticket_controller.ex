@@ -58,24 +58,26 @@ defmodule Discovery.TicketController do
     end
   end
   # We pass in the user as a param of the show page
-  # We find the specific ticket for the given user using user_tickets/1
   # Render the ticket show view with the ticket specified
   def show(conn, %{"id" => id}, user) do
-    ticket = Repo.get!(get_tickets_assigned_to_user(user), id)
+    # ticket = Repo.get!(get_tickets_assigned_to_user(user), id)
+    ticket = Repo.get!(Ticket, id)
     render(conn, "show.html", ticket: ticket)
   end
   # We pass in the user as a param of the edit page
   # We find the specific ticket for the given user using user_tickets/1
   # Render the ticket edit view with the ticket specified and form changeset
   def edit(conn, %{"id" => id}, user) do
-    ticket = Repo.get!(get_tickets_assigned_to_user(user), id)
+    # ticket = Repo.get!(get_tickets_assigned_to_user(user), id)
+    ticket = Repo.get!(Ticket, id)
     changeset = Ticket.changeset(ticket)
     render(conn, "edit.html", ticket: ticket, changeset: changeset, users: get_users_from_user_company(user.company_id))
   end
 
   # Same deal as Discovery.Ticket.Create/3
   def update(conn, %{"id" => id, "ticket" => ticket_params}, user) do
-    ticket = Repo.get!(get_tickets_assigned_to_user(user), id)
+    # ticket = Repo.get!(get_tickets_assigned_to_user(user), id)
+    ticket = Repo.get!(Ticket, id)
     changeset = 
       Ticket.changeset(ticket, ticket_params)
 

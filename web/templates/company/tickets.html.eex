@@ -6,6 +6,8 @@
       <th>Title</th>
       <th>Created on</th>
       <th>Updated on</th>
+      <th>Assigned to</th>
+      <th>Assigned to name</th>
       <th>Created by</th>
       <th></th>
     </tr>
@@ -16,6 +18,8 @@
       <td><%= ticket.title %></td>
       <td><%= ticket.created_on %></td>
       <td><%= ticket.updated_on %></td>
+      <td><%= ticket.assigned_to %></td>
+      <td><%= ticket.assigned_to_name %></td>
       <td><%= ticket.created_by %></td>
       <td class="text-right">
         <%= link "Show", to: ticket_path(@conn, :show, ticket), class: "btn btn-default btn-xs" %>
