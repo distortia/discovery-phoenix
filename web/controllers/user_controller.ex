@@ -22,7 +22,7 @@ defmodule Discovery.UserController do
 
   def create(conn, %{"user" => user_params}) do
     changeset = User.registration_changeset(%User{}, user_params)
-    company = Repo.get!(Company, user_params["unique_company_id"])
+    company = Repo.get_by!(Company, unique_id: user_params["unique_company_id"])
     case Repo.insert(changeset) do
       {:ok, user} ->
         conn

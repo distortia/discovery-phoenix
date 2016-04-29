@@ -29,6 +29,7 @@ defmodule Discovery.CompanyController do
   def create(conn, %{"company" => company_params}, user) do
     # Original Changeset
     changeset = Company.changeset(%Company{}, company_params)
+    |> Ecto.Changeset.put_change(:unique_id, Discovery.EmailController.random_string(10))
 
     case Repo.insert(changeset) do
       {:ok, company} ->

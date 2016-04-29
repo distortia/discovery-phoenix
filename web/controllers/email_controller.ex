@@ -9,14 +9,14 @@ defmodule Discovery.EmailController do
 	def invite(conn, %{"company" => company, "users" => users}) do
 		
 		company = Repo.get!(Company, company)
-		link = "http://localhost:4000/users/new/#{company.id}"
+		link = "http://localhost:4000/users/new/#{company.unique_id}"
 		
 		users["email"]
 		|> String.split(",")
 		|> Enum.each(fn(email) -> 
 			Email.invite_email(company, email, link)
 			|> Mailer.deliver_later()
-		end)
+			end)
 
 		conn
 		|> put_flash(:info, "Invitiation sent!")
