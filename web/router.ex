@@ -27,7 +27,11 @@ defmodule Discovery.Router do
     post "/reset", EmailController, :reset
     get "/reset/:auth_id", UserController, :new_password
     post "/reset/update", UserController, :update_password
-   
+  end
+
+  scope "/users", Discovery do
+    pipe_through [:browser, :authenticated_not_allowed]
+    # Create a user
     get "/new", UserController, :new_redirect
     get "/new/:unique_company_id", UserController, :new
     post "/", UserController, :create
