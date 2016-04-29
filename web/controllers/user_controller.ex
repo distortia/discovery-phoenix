@@ -30,7 +30,7 @@ defmodule Discovery.UserController do
         |> put_flash(:info, "Welcome #{user.first_name} #{user.last_name}!")
         |> redirect(to: company_path(conn, :join_company, company: company))
       {:error, changeset} ->
-        render(conn, "new.html", changeset: changeset)
+        render(conn, "new.html", changeset: changeset, unique_company_id: user_params["unique_company_id"])
     end
   end
 

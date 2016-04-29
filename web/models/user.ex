@@ -30,6 +30,7 @@ defmodule Discovery.User do
     |> cast(params, ~w(first_name last_name email role), [])
     |> unique_constraint(:email)
     |> validate_length(:email, min: 1)
+    |> validate_format(:email, ~r/@/) # Checks for @ sign in email
     |> update_change(:email, &String.downcase/1) # Normalize all emails
   end
 
@@ -37,7 +38,11 @@ defmodule Discovery.User do
     model
     |> changeset(params)
     |> cast(params, ~w(password), [])
-    |> validate_length(:password, min: 6, max: 100)
+    |> validate_length(:password, min: 8)
+    |> validate_format(:password, ~r/[a-z]/)
+    |> validate_format(:password, ~r/[A-Z]/)
+    |> validate_format(:password, ~r/[0-9]/)
+    |> validate_format(:password, ~r/[!@#$%^&+=]/)
     |> put_pass_hash()
   end
 
@@ -50,7 +55,11 @@ defmodule Discovery.User do
         model
         |> changeset(params)
         |> cast(params, ~w(password), [])
-        |> validate_length(:password, min: 6, max: 100)
+        |> validate_length(:password, min: 8)
+        |> validate_format(:password, ~r/[a-z]/)
+        |> validate_format(:password, ~r/[A-Z]/)
+        |> validate_format(:password, ~r/[0-9]/)
+        |> validate_format(:password, ~r/[!@#$%^&+=]/)
         |> put_pass_hash()
     end
   end
