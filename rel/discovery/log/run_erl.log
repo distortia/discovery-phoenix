@@ -1,8 +1,0 @@
-run_erl [20643] Wed Apr 27 20:26:42 2016
-Args before exec of shell:
-run_erl [20643] Wed Apr 27 20:26:42 2016
-argv[0] = sh
-run_erl [20643] Wed Apr 27 20:26:42 2016
-argv[1] = -c
-run_erl [20643] Wed Apr 27 20:26:42 2016
-argv[2] = exec "/Users/darrellpappa/discovery-phoenix/rel/discovery/bin/discovery" "console"
