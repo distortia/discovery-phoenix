@@ -33,7 +33,9 @@
               <li><%= link "Home", to: page_path(@conn, :index) %></li>
               <li><%= link "Users", to: user_path(@conn, :index) %></li>
               <li><%= link "Tickets", to: ticket_path(@conn, :index) %></li>
-              <li><%= link "Company", to: company_path(@conn, :index) %></li>
+              <%= if @current_user.company_id do %>
+                <li><%= link "Company", to: company_path(@conn, :show, @current_user.company_id) %></li>
+              <% end %>
               <li><%= link "Log Out", to: session_path(@conn, :delete, @current_user), method: "delete" %></li>
             <% else %>
               <li><%= link "Log In", to: session_path(@conn, :new) %></li>

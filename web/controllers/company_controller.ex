@@ -4,6 +4,10 @@ defmodule Discovery.CompanyController do
   alias Discovery.Company
 
   plug :scrub_params, "company" when action in [:create, :update]
+  plug :user_in_company when action in [:show, :update, :delete, :edit]
+
+  #Temporary plug to prevent access to view all companies
+  plug :access_all_companies when action in [:index]
 
   # This Action assigns the current user to the connection
   # Allowing us to pass the user to different controllers and routes
@@ -119,4 +123,28 @@ defmodule Discovery.CompanyController do
   defp user_company(user) do
     assoc(user, :company)
   end
+
+  def user_in_company(conn, _opts) do
+    if conn.params["id"] == to_string(conn.assigns.current_user.company_id) do
+      conn
+    else
+      conn
+       |> put_flash(:error, "Error, You do not have access do this")
+       |> redirect(to: user_path(conn, :index))
+       |> halt()  
+    end
+  end
+
+  #For now, no regular user has access to view all of the companies
+  def access_all_companies(conn, _opts) do
+    if(to_string(conn.assigns.current_user.role) == "God") do
+      conn
+    else
+      conn
+       |> put_flash(:error, "Error, You do not have access do this")
+       |> redirect(to: Discovery.Router.Helpers.page_path(conn, :index))
+       |> halt()  
+    end
+  end
+
 end
