@@ -15,6 +15,8 @@ defmodule Discovery do
       # worker(Discovery.Worker, [arg1, arg2, arg3]),
       # Bamboo email supervisor that handles deliver_later calls
       Bamboo.TaskSupervisorStrategy.child_spec
+      # Here we add a router for exrm
+      # supervisor(Discovery.Router, [], function: :start)
     ]
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
