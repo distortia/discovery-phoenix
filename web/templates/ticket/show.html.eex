@@ -44,7 +44,11 @@
 
   <li>
     <strong>Tags:</strong>
-    <%= @ticket.tags %>
+    <ul>
+      <%= for item <- @ticket.tags do %>
+        <li><%= item %></li>
+      <% end %>
+    </ul>
   </li>
 
   <li>

@@ -69,8 +69,13 @@ defmodule Discovery.CompanyController do
 
   def update(conn, %{"id" => id, "company" => company_params}, user) do
     company = Repo.get!(Company, id)
-    changeset = Company.changeset(company, company_params)
-
+    if company_params["tag"] do
+      new_tags = List.insert_at(company.company_tags, length(company.company_tags), to_string(company_params["tag"]))
+      new_params = %{"name" => to_string(company_params["name"]), "company_tags" => new_tags}
+      changeset = Company.changeset(company, new_params)
+    else
+      changeset = Company.changeset(company, company_params)
+    end
     case Repo.update(changeset) do
       {:ok, company} ->
         conn

@@ -32,7 +32,9 @@ defmodule Discovery.TicketController do
     user
     |> build_assoc(:tickets)
     |> Ticket.changeset()
-    render(conn, "new.html", changeset: changeset, users: get_users_from_user_company(user.company_id))
+    # Gets the avaliable tags to use
+    tags = Repo.get!(Company, user.company_id)
+    render(conn, "new.html", changeset: changeset, users: get_users_from_user_company(user.company_id), tags: tags.company_tags)
   end
 
   # We pass in the user as a param of the new ticket process
@@ -70,7 +72,8 @@ defmodule Discovery.TicketController do
   def edit(conn, %{"id" => id}, user) do
     ticket = Repo.get!(get_tickets_assigned_to_user(user), id)
     changeset = Ticket.changeset(ticket)
-    render(conn, "edit.html", ticket: ticket, changeset: changeset, users: get_users_from_user_company(user.company_id))
+    tags = Repo.get!(Company, user.company_id)
+    render(conn, "edit.html", ticket: ticket, changeset: changeset, users: get_users_from_user_company(user.company_id), tags: tags.company_tags)
   end
 
   # Same deal as Discovery.Ticket.Create/3
