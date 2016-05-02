@@ -14,7 +14,7 @@ defmodule Discovery do
       # Here you could define other workers and supervisors as children
       # worker(Discovery.Worker, [arg1, arg2, arg3]),
       # Bamboo email supervisor that handles deliver_later calls
-      Bamboo.TaskSupervisorStrategy.child_spec
+      # Bamboo.TaskSupervisorStrategy.child_spec
     ]
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
