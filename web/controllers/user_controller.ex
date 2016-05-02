@@ -21,9 +21,15 @@ defmodule Discovery.UserController do
   end
 
   def create(conn, %{"user" => user_params}) do
-    changeset = User.registration_changeset(%User{}, user_params)
+    # User is already in DB from invitation - Find them
+    user = Repo.get_by!(User, email: user_params["email"])
+    # Get the registration changeset from that user and cast the params submitted
+    changeset = User.registration_changeset(user, user_params)
+    |> Ecto.Changeset.put_change(:auth_id, "")
+
     company = Repo.get_by!(Company, unique_id: user_params["unique_company_id"])
-    case Repo.insert(changeset) do
+
+    case Repo.update(changeset) do
       {:ok, user} ->
         conn
         |> Discovery.Auth.login(user)
