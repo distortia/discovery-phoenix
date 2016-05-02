@@ -32,8 +32,9 @@ defmodule Discovery.Router do
   scope "/users", Discovery do
     pipe_through [:browser, :authenticated_not_allowed]
     # Create a user
-    get "/new", UserController, :new_redirect
-    get "/new/:unique_company_id", UserController, :new
+    get "/new", UserController, :new_redirect # Graceful fallback
+    get "/new/:unique_company_id", UserController, :new_redirect # Graceful fallback
+    get "/new/:unique_company_id/:token", UserController, :new
     post "/", UserController, :create
   end
 

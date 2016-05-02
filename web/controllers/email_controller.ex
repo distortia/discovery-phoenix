@@ -7,20 +7,31 @@ defmodule Discovery.EmailController do
 	alias Discovery.User
 
 	def invite(conn, %{"company" => company, "users" => users}) do
-		
 		company = Repo.get!(Company, company)
-		link = "http://localhost:4000/users/new/#{company.unique_id}"
-		
 		users["email"]
 		|> String.split(",")
 		|> Enum.each(fn(email) -> 
-			Email.invite_email(company, email, link)
-			|> Mailer.deliver_later()
-			end)
-
-		conn
-		|> put_flash(:info, "Invitiation sent!")
-		|> redirect(to: company_path(conn, :show, company.id))
+			token = random_string(10)
+			link = "http://localhost:4000/users/new/#{company.unique_id}/#{token}"
+			case create_soft_user(email, token) do
+				{:error, "exists"} ->
+					conn
+					|> put_flash(:error, "User: #{email} already registered")
+					|> redirect(to: company_path(conn, :show, company.id))
+				{:ok, "created"} -> 
+					Email.invite_email(company, email, link)
+					|> Mailer.deliver_later()
+					conn
+					|> put_flash(:info, "Invitation sent!")
+					|> redirect(to: company_path(conn, :show, company.id))
+				{:ok, "updated"} -> 
+					Email.invite_email(company, email, link)
+					|> Mailer.deliver_later()
+					conn
+					|> put_flash(:info, "Invitation sent!")
+					|> redirect(to: company_path(conn, :show, company.id))
+			end
+		end)
 	end
 
 	def reset(conn, %{"reset_form" => reset_params}) do
@@ -56,6 +67,25 @@ defmodule Discovery.EmailController do
 	def random_string(length) do
   		:crypto.strong_rand_bytes(length) |> Base.url_encode64 |> binary_part(0, length)
 	end
+
+	defp create_soft_user(email, token) do
+		# Create a user in the DB with the email its being sent to and associate it to the auth id
+		user = Repo.get_by(User, email: email)
+		case user do
+			nil -> # User wasnt found go ahead and make a user
+				Repo.insert(%User{email: email, auth_id: token})
+				{:ok, "created"}
+			_ -> # Otherwise we have a registered or invited user 
+			case (user.auth_id != "") do # Check if name is blank, that is the default setup for creating a soft user
+				 true -> # User hasnt finished registration - update their token
+					# Repo.update(user, %User{auth_id: token})
+					Repo.update(Ecto.Changeset.change user, auth_id: token)
+					{:ok, "updated"}
+				_ -> # User already registered
+					{:error, "exists"}
+			end
+		end
+	end
 end
 
 # Define your emails
@@ -69,7 +99,7 @@ defmodule Discovery.Email do
     |> subject("Discovery - Invitation")
     |> html_body(
     	"You have been invited to join the company #{String.upcase(company.name)} in Discovery.
-     	Click this link to join: #{link} ")
+     	Click this link to join: #{link}")
   end
 
 	def reset_password_email(email, link) do

@@ -27,7 +27,7 @@ defmodule Discovery.User do
   """
   def changeset(model, params \\ :empty) do
     model
-    |> cast(params, ~w(first_name last_name email role), [])
+    |> cast(params, ~w(first_name last_name email role), ~w(auth_id))
     |> unique_constraint(:email)
     |> validate_length(:email, min: 1)
     |> validate_format(:email, ~r/@/) # Checks for @ sign in email
