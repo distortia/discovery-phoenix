@@ -22,7 +22,7 @@ defmodule Discovery.Mixfile do
   def application do
     [mod: {Discovery, []},
      applications: [:phoenix, :phoenix_html, :cowboy, :logger, :gettext,
-                    :phoenix_ecto, :postgrex, :comeonin, :bamboo]]
+                    :phoenix_ecto, :postgrex, :comeonin, :bamboo, :exrm]]
   end
 
   # Specifies which paths to compile per environment.
@@ -42,7 +42,9 @@ defmodule Discovery.Mixfile do
      {:cowboy, "~> 1.0"},
      {:comeonin, "~> 2.0"},
      {:bamboo, "~> 0.4"},
-     {:excoveralls, "~> 0.4", only: :test}]
+     {:excoveralls, "~> 0.4", only: :test},
+     {:exrm, "~> 0.19.9"}
+     ]
   end
 
   # Aliases are shortcut or tasks specific to the current project.

@@ -11,7 +11,7 @@ defmodule Discovery.Ticket do
     field :created_on, :string
     field :severity, :string, default: "Normal"
     field :updated_on, :string
-    field :tags, {:array, :string}
+    field :tags, {:array, :string}, default: []
     field :status, :string, default: "Open"
     field :created_by, :string
     field :assigned_to, :string
