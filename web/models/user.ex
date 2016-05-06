@@ -34,15 +34,20 @@ defmodule Discovery.User do
     |> update_change(:email, &String.downcase/1) # Normalize all emails
   end
 
-  def registration_changeset(model, params) do
+  def password_changeset(model, params) do
     model
-    |> changeset(params)
-    |> cast(params, ~w(password), [])
+    |> cast(params, ~w(password), []) 
     |> validate_length(:password, min: 8)
     |> validate_format(:password, ~r/[a-z]/)
     |> validate_format(:password, ~r/[A-Z]/)
     |> validate_format(:password, ~r/[0-9]/)
     |> validate_format(:password, ~r/[!@#$%^&+=]/)
+  end
+
+  def registration_changeset(model, params) do
+    model
+    |> changeset(params)
+    |> password_changeset(params)
     |> put_pass_hash()
   end
 
@@ -54,12 +59,7 @@ defmodule Discovery.User do
       _ ->
         model
         |> changeset(params)
-        |> cast(params, ~w(password), [])
-        |> validate_length(:password, min: 8)
-        |> validate_format(:password, ~r/[a-z]/)
-        |> validate_format(:password, ~r/[A-Z]/)
-        |> validate_format(:password, ~r/[0-9]/)
-        |> validate_format(:password, ~r/[!@#$%^&+=]/)
+        |> password_changeset(params)
         |> put_pass_hash()
     end
   end
