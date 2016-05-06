@@ -102,4 +102,10 @@ defmodule Discovery.UserTest do
     changeset = User.update_changeset(%User{}, %{"first_name" => "New", "last_name" => "Name", "password" => "P@ssW3rd", "email" => "testuser@test.com", "role" => "User"})
     assert Map.has_key?(changeset.changes, :password)
   end
+
+  @tag login_as: "testuser@test.com"
+  test "Update Owner Changeset", %{conn: conn, user: user} do
+    changeset = User.update_owner_changeset(%User{}, @valid_attrs)
+    assert changeset.valid?
+  end
 end
