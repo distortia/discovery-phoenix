@@ -7,7 +7,7 @@ defmodule Discovery.UserTest do
   @invalid_attrs %{first_name: "invalid", auth_id: "123"}
   @updated_attrs_no_pass %{first_name: "New", last_name: "Name", password: "", email: "testuser@test.com", role: "User", auth_id: "123"}
   @updated_attrs_with_pass %{first_name: "New", last_name: "Name", password: "P@ssW3rd", email: "testuser@test.com", role: "User", auth_id: "123"}
-
+  @new_role %{first_name: "Test", last_name: "User", email: "testuser@test.com", password: "Val1dP@ass", role: "Admin", auth_id: "123"}
   @valid_email %{email: "test@test.com"}
   @valid_email_caps %{email: "TEST@TEST.com"}
   @invalid_email %{email: "testuser"}
@@ -104,8 +104,17 @@ defmodule Discovery.UserTest do
   end
 
   @tag login_as: "testuser@test.com"
-  test "Update Owner Changeset", %{conn: conn, user: user} do
-    changeset = User.update_owner_changeset(%User{}, @valid_attrs)
+  test "Role gets updated into the changeset", %{conn: conn, user: user} do
+    changeset = User.update_owner_changeset(%User{}, @new_role)
     assert changeset.valid?
+    assert changeset.changes.role == "Admin"
+  end
+
+  @tag login_as: "testuser@test.com"
+  test "Update Owner no change", %{conn: conn, user: user} do
+    changeset = 
+    Repo.get_by!(User, email: "testuser@test.com")
+    |> User.update_owner_changeset(@valid_attrs)
+    assert changeset.changes == %{}
   end
 end
