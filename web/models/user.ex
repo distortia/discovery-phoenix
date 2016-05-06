@@ -34,10 +34,10 @@ defmodule Discovery.User do
   def email_changeset(model, params) do
     model
     |> cast(params, ~w(email), [])
-    |> unique_constraint(:email)
     |> validate_length(:email, min: 1)
     |> validate_format(:email, ~r/@/) # Checks for @ sign in email
     |> update_change(:email, &String.downcase/1) # Normalize all emails
+    |> unique_constraint(:email)
   end
 
   def password_changeset(model, params) do
@@ -58,15 +58,26 @@ defmodule Discovery.User do
   end
 
   def update_changeset(model, params) do
-    case params["password"] do
-      "" ->
-        model
-        |> changeset(params)
-      _ ->
-        model
-        |> changeset(params)
-        |> password_changeset(params)
-        |> put_pass_hash()
+    cond do
+      Map.has_key?(params, :password) -> 
+        case params[:password] do
+          "" -> 
+            model
+            |> changeset(params)
+          _ -> 
+            model
+            |> registration_changeset(params)
+        end
+      Map.has_key?(params, "password") -> 
+        case params["password"] do
+          "" -> 
+            model
+            |> changeset(params)
+          _ -> 
+            model
+            |> registration_changeset(params)
+          end
+      true -> IO.puts "You shouldnt see this"
     end
   end
 

@@ -5,8 +5,11 @@ defmodule Discovery.UserTest do
 
   @valid_attrs %{first_name: "Test", last_name: "User", email: "testuser@test.com", password: "Val1dP@ass", role: "User", auth_id: "123"}
   @invalid_attrs %{first_name: "invalid", auth_id: "123"}
+  @updated_attrs_no_pass %{first_name: "New", last_name: "Name", password: "", email: "testuser@test.com", role: "User", auth_id: "123"}
+  @updated_attrs_with_pass %{first_name: "New", last_name: "Name", password: "P@ssW3rd", email: "testuser@test.com", role: "User", auth_id: "123"}
 
   @valid_email %{email: "test@test.com"}
+  @valid_email_caps %{email: "TEST@TEST.com"}
   @invalid_email %{email: "testuser"}
   @invalid_email_unique %{email: "testuser@test.com"}
 
@@ -16,6 +19,16 @@ defmodule Discovery.UserTest do
   @invalid_password_no_lowercase %{first_name: "Test", last_name: "User", email: "testuser@test.com", password: "!NVALIDPASS", role: "User", auth_id: "123"}
   @invalid_password_no_uppercase %{first_name: "Test", last_name: "User", email: "testuser@test.com", password: "!nvalidpass", role: "User", auth_id: "123"}
   @invalid_password_no_special_character %{first_name: "Test", last_name: "User", email: "testuser@test.com", password: "1nvalidPass", role: "User", auth_id: "123"}
+ 
+  setup %{conn: conn} = config do
+    if email = config[:login_as] do
+      user = insert_user(email: email)
+      conn = assign(conn, :current_user, user)
+      {:ok, conn: conn, user: user}
+    else
+      :ok
+    end
+  end
 
   test "changeset with valid attributes" do
     changeset = User.changeset(%User{}, @valid_attrs)
@@ -52,14 +65,41 @@ defmodule Discovery.UserTest do
   end
 
   test "Invalid email changesets" do
-      insert_user(email: "testuser@test.com")
-      |> IO.inspect()
-      Enum.each([
-        @invalid_email,
-        @invalid_email_unique
-      ], fn(requirements) ->
-        changeset = User.email_changeset(%User{}, requirements) 
-        refute changeset.valid?
-      end)
+    changeset = User.email_changeset(%User{}, @invalid_email)
+    refute changeset.valid?
+  end
+
+  test "Email is taken" do
+    user = 
+    User.registration_changeset(%User{}, @valid_attrs)
+    |> Repo.insert!
+
+    changeset = User.email_changeset(%User{}, %{email: "testuser@test.com"})
+    {:error, changeset} = Repo.insert(changeset)
+    assert changeset.errors == [email: "has already been taken"]
+  end
+
+  test "Emails are normalized" do
+    email = "TEST@TEST.COM"
+    changeset = User.email_changeset(%User{}, %{email: email})
+    assert changeset.changes.email == String.downcase(email)
+  end
+
+  @tag login_as: "testuser@test.com"
+  test "Update changeset for user profile - No password", %{conn: conn, user: user} do
+      changeset = User.update_changeset(%User{}, @updated_attrs_no_pass)
+      refute Map.has_key?(changeset.changes, :password)
+  end
+
+  @tag login_as: "testuser@test.com"
+  test "Password update changeset with key: value format", %{conn: conn, user: user} do
+    changeset = User.update_changeset(%User{}, @updated_attrs_with_pass)
+    assert Map.has_key?(changeset.changes, :password)
+  end  
+
+  @tag login_as: "testuser@test.com"
+  test "Password update changeset with key => value format", %{conn: conn, user: user} do
+    changeset = User.update_changeset(%User{}, %{"first_name" => "New", "last_name" => "Name", "password" => "P@ssW3rd", "email" => "testuser@test.com", "role" => "User"})
+    assert Map.has_key?(changeset.changes, :password)
   end
 end

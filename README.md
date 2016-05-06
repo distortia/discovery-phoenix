@@ -11,6 +11,7 @@ Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
 
 Ready to run in production? Please [check our deployment guides](http://www.phoenixframework.org/docs/deployment).
 
+#### To check code coverage run `mix coveralls`
 ## Resources
 
   * [http://blog.trackets.com/2013/08/19/postgresql-basics-by-example.html](PSQL Basics)

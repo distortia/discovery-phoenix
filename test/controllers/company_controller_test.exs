@@ -27,4 +27,13 @@ defmodule Discovery.CompanyControllerTest do
         assert get_flash(conn, :error) == "Error, You must be logged in to access this page"
       end)
   end 
+
+  test "Invite user", %{conn: conn} do
+    # Flash message saying Invitaion sent!
+    # Redirected back to company page
+  end
+  test "Invite a user who already registered", %{conn: conn} do
+    # flash message is User: nickstalter+4@gmail.com already registered
+    # And you are on the company page
+  end
 end
