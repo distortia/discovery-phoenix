@@ -160,7 +160,7 @@ defmodule Discovery.UserController do
   # redirects any user who didnt get the email and may have accidentally got to this url
   def new_redirect(conn, _params) do
     conn
-    |> put_flash(:error, "You must be invited before you can create an account. Please contact support or your organizational leader for help")
+    |> put_flash(:error, "You must be invited before you can create an account. Please contact support or your organizational leader for help.")
     |> redirect(to: page_path(conn, :index))
   end
 end
