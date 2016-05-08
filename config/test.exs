@@ -17,3 +17,7 @@ config :discovery, Discovery.Repo,
   database: "discovery_test",
   hostname: "localhost",
   pool: Ecto.Adapters.SQL.Sandbox
+
+# Make password hashing less taxing on our test environment for better speeds
+config :comeonein, :bcrypt_log_rounds, 4
+config :comeonein, :pbkdf2_rounds, 1
