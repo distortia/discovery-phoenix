@@ -74,7 +74,11 @@ defmodule Discovery.TicketController do
     ticket = Repo.get!(Ticket, id)
     changeset = Ticket.changeset(ticket)
     tags = Repo.get!(Company, user.company_id)
-    render(conn, "edit.html", ticket: ticket, changeset: changeset, users: get_users_from_user_company(user.company_id), tags: tags.company_tags)
+    case tags.company_tags do
+      nil -> tags = []
+      _ -> tags = tags.company_tags
+    end
+    render(conn, "edit.html", ticket: ticket, changeset: changeset, users: get_users_from_user_company(user.company_id), tags: tags)
   end
 
   # Same deal as Discovery.Ticket.Create/3
