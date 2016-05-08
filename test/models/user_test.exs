@@ -2,6 +2,7 @@ defmodule Discovery.UserTest do
   use Discovery.ModelCase
   use Discovery.ConnCase
   alias Discovery.User
+  import Comeonin.Bcrypt, only: [checkpw: 2]
 
   @valid_attrs %{first_name: "Test", last_name: "User", email: "testuser@test.com", password: "Val1dP@ass", role: "User", auth_id: "123"}
   @invalid_attrs %{first_name: "invalid", auth_id: "123"}
@@ -13,7 +14,7 @@ defmodule Discovery.UserTest do
   @invalid_email %{email: "testuser"}
   @invalid_email_unique %{email: "testuser@test.com"}
 
-  @valid_password %{password: "P@ssw0rd!"}
+  @valid_password %{password: "Val1dP@ass"}
   @invalid_password_length %{first_name: "Test", last_name: "User", email: "testuser@test.com", password: "1", role: "User", auth_id: "123"}
   @invalid_password_no_numbers %{first_name: "Test", last_name: "User", email: "testuser@test.com", password: "!nvalidPass", role: "User", auth_id: "123"}
   @invalid_password_no_lowercase %{first_name: "Test", last_name: "User", email: "testuser@test.com", password: "!NVALIDPASS", role: "User", auth_id: "123"}
@@ -116,5 +117,23 @@ defmodule Discovery.UserTest do
     Repo.get_by!(User, email: "testuser@test.com")
     |> User.update_owner_changeset(@valid_attrs)
     assert changeset.changes == %{}
+  end
+
+  test "Password Hash with password" do
+    user = 
+    User.registration_changeset(%User{}, @valid_attrs)
+    |> Repo.insert!
+
+    assert checkpw("Val1dP@ass", user.password_hash)
+  end
+
+  test "Update changeset for the true statement" do
+    assert User.update_changeset(%User{}, %{}) == :ok
+  end
+
+  test "Update changeset - params[\"password\"]" do
+    changeset = 
+    User.update_changeset(%User{}, %{"first_name" => "Test", "last_name" => "User", "email" => "testuser@test.com", "password" => "", "role" => "User", "auth_id" => "123"})
+
   end
 end

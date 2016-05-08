@@ -77,7 +77,8 @@ defmodule Discovery.User do
             model
             |> registration_changeset(params)
           end
-      true -> IO.puts "You shouldnt see this"
+      true ->
+        :ok
     end
   end
 
