@@ -21,3 +21,6 @@ config :discovery, Discovery.Repo,
 # Make password hashing less taxing on our test environment for better speeds
 config :comeonein, :bcrypt_log_rounds, 4
 config :comeonein, :pbkdf2_rounds, 1
+
+config :discovery, Discovery.Mailer,
+  adapter: Bamboo.TestAdapter

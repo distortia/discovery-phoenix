@@ -22,7 +22,7 @@ defmodule Discovery.EmailController do
 					:error
 				{:ok, _} ->
 					Email.invite_email(company, email, link)
-					|> Mailer.deliver_later()
+					|> Mailer.deliver_now()
 					:ok
 			end
 		end)

@@ -28,8 +28,3 @@ config :phoenix, :generators,
   migration: true,
   binary_id: false
 
-# Configures Bamboo Mailer
-config :discovery, Discovery.Mailer,
-  adapter: Bamboo.SendgridAdapter,
-  api_key: "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"
-
