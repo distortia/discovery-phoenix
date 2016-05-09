@@ -99,6 +99,7 @@ defmodule Discovery.EmailControllerTest do
 		link = "http://localhost:4000/users/new/#{company.unique_id}/#{token}"
 		Enum.each(emails, fn(email) -> 
 			conn = Email.invite_email(company, email, link)
+			assert conn.from == "support@alphaity.io"
 	    	assert conn.to == email
 	    	assert conn.subject == "Discovery - Invitation"
 	    	assert conn.html_body =~ "You have been invited to join the company #{String.upcase(company.name)} in Discovery.
@@ -117,7 +118,31 @@ defmodule Discovery.EmailControllerTest do
 		Email.invite_email(company, email, link)
 		|> Discovery.Mailer.deliver_now
 
-		# # Works with deliver_now and deliver_later
 		assert_delivered_email(sent_email)
+	end
+
+	test "Reset password email", %{conn: conn} do
+		random_auth_id = "123"
+		link = "http://localhost:4000/users/reset/#{random_auth_id}"
+		email = "test@test.com"
+
+		conn = Email.reset_password_email(email, link)
+		assert conn.from == "support@alphaity.io"
+    	assert conn.to == email
+    	assert conn.subject == "Reset Password"
+    	assert conn.html_body =~ "A request has been to reset your password, please follow this link to reset it: #{link}"
+	end
+
+
+	test "Sending of reset password email", %{conn: conn} do
+		random_auth_id = "123"
+		link = "http://localhost:4000/users/reset/#{random_auth_id}"
+		email = "test@test.com"
+
+		sent_email = 
+		Email.reset_password_email(email, link)
+		|> Discovery.Mailer.deliver_now
+
+		assert_delivered_email(sent_email)	
 	end
 end
