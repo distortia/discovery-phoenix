@@ -9,7 +9,7 @@ defmodule Discovery.TestHelpers do
       email: "#{Base.encode16(:crypto.rand_bytes(8))}@unittest.com",
       password: "Val1dP@ass",
       role: "User",
-      auth_id: "123"
+      auth_id: ""
     }, attrs)
 
     %Discovery.User{}
@@ -29,8 +29,8 @@ defmodule Discovery.TestHelpers do
 
   def insert_company(attrs \\ %{}) do
   	changes = Dict.merge(%{
-      name: "testComp",
-      unique_id: "1"
+      name: "UnitTestComp",
+      unique_id: "0123"
       }, attrs)
 
     %Discovery.Company{}

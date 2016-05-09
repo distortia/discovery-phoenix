@@ -8,30 +8,44 @@ defmodule Discovery.EmailController do
 
 	def invite(conn, %{"company" => company, "users" => users}) do
 		company = Repo.get!(Company, company)
-		users["email"]
+		users_list = 
+		users["email"] 
 		|> String.split(",")
-		|> Enum.each(fn(email) -> 
+		# Creates soft users for all email addresses passed in
+		# Returns a list of atoms
+		invite_list = 
+		Enum.map(users_list, fn(email) -> 
 			token = random_string(10)
 			link = "http://localhost:4000/users/new/#{company.unique_id}/#{token}"
 			case create_soft_user(email, token) do
 				{:error, "exists"} ->
-					conn
-					|> put_flash(:error, "User: #{email} already registered")
-					|> redirect(to: company_path(conn, :show, company.id))
-				{:ok, "created"} -> 
+					:error
+				{:ok, _} ->
 					Email.invite_email(company, email, link)
 					|> Mailer.deliver_later()
-					conn
-					|> put_flash(:info, "Invitation sent!")
-					|> redirect(to: company_path(conn, :show, company.id))
-				{:ok, "updated"} -> 
-					Email.invite_email(company, email, link)
-					|> Mailer.deliver_later()
-					conn
-					|> put_flash(:info, "Invitation sent!")
-					|> redirect(to: company_path(conn, :show, company.id))
+					:ok
 			end
 		end)
+		# Check if we got any errors back from the creation of soft users
+		if Enum.member?(invite_list, :error) do
+			case Enum.count(invite_list) do
+				# If we only invited 1 user and they have already registered 
+				1 ->
+					conn
+					|> put_flash(:error, "The user you invited has already registered.")
+					|> redirect(to: company_path(conn, :show, company.id))
+				# We got an error when trying to register n users
+				_ ->
+					conn
+					|> put_flash(:warn, "One of the users you invited has already registered. Any other invites were sent.")
+					|> redirect(to: company_path(conn, :show, company.id))
+			end
+		# No errors found
+		else
+			conn
+			|> put_flash(:info, "Invitation sent!")
+			|> redirect(to: company_path(conn, :show, company.id))
+		end
 	end
 
 	def reset(conn, %{"reset_form" => reset_params}) do
@@ -64,11 +78,11 @@ defmodule Discovery.EmailController do
 	end
 
 	# http://stackoverflow.com/questions/32001606/how-to-generate-a-random-url-safe-string-with-elixir
-	def random_string(length) do
+	defp random_string(length) do
   		:crypto.strong_rand_bytes(length) |> Base.url_encode64 |> binary_part(0, length)
 	end
 
-	defp create_soft_user(email, token) do
+	def create_soft_user(email, token) do
 		# Create a user in the DB with the email its being sent to and associate it to the auth id
 		user = Repo.get_by(User, email: email)
 		case user do
