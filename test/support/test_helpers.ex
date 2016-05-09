@@ -27,7 +27,14 @@ defmodule Discovery.TestHelpers do
     |> Repo.insert!()
   end
 
-  def insert_company() do
-  	
+  def insert_company(attrs \\ %{}) do
+  	changes = Dict.merge(%{
+      name: "testComp",
+      unique_id: "1"
+      }, attrs)
+
+    %Discovery.Company{}
+    |> Discovery.Company.changeset(changes)
+    |> Repo.insert!()
   end
 end
