@@ -4,6 +4,10 @@ defmodule Discovery.CompanyController do
   alias Discovery.Company
 
   plug :scrub_params, "company" when action in [:create, :update]
+  plug :user_in_company when action in [:show, :update, :delete, :edit]
+
+  #Temporary plug to prevent access to view all companies
+  plug :access_all_companies when action in [:index]
 
   # This Action assigns the current user to the connection
   # Allowing us to pass the user to different controllers and routes
@@ -29,6 +33,7 @@ defmodule Discovery.CompanyController do
   def create(conn, %{"company" => company_params}, user) do
     # Original Changeset
     changeset = Company.changeset(%Company{}, company_params)
+    |> Ecto.Changeset.put_change(:unique_id, Discovery.EmailController.random_string(10))
 
     case Repo.insert(changeset) do
       {:ok, company} ->
@@ -65,7 +70,14 @@ defmodule Discovery.CompanyController do
 
   def update(conn, %{"id" => id, "company" => company_params}, user) do
     company = Repo.get!(Company, id)
-    changeset = Company.changeset(company, company_params)
+    changeset = nil
+    if company_params["tag"] do
+      new_tags = List.insert_at(company.company_tags, length(company.company_tags), to_string(company_params["tag"]))
+      new_params = %{"name" => to_string(company_params["name"]), "company_tags" => new_tags}
+      changeset = Company.changeset(company, new_params)
+    else
+      changeset = Company.changeset(company, company_params)
+    end
 
     case Repo.update(changeset) do
       {:ok, company} ->
@@ -95,40 +107,21 @@ defmodule Discovery.CompanyController do
   end
 
 
-  def join_company(conn, %{"company" => company_params}, user) do  
+  def join_company(conn, %{"company" => company_id}, user) do 
     user = Repo.preload(user, :company)
-    # Company_params comes back as a Map in the form %{"name" : "name of company"}
-    # Extract the company name from the map
-    company_name = Map.get(company_params, "name")
-    # We omit the ! in get_by so we don't auto fail when company doesnt exist or could be found
-    case Repo.get_by(Company, name: company_name) do
-      nil ->
-        changeset = Company.changeset(%Company{}, company_params)
-        conn
-        |> put_flash(:error, "No company by the name: #{company_name}")
-        |> render("join.html", changeset: changeset, user: user)
-      _ -> # if its anything but nil do this
-        # Find the company and build the association
-        company = 
-          Repo.get_by!(Company, name: company_name)
-          |> Ecto.build_assoc(:users, Map.from_struct user)
 
-        # Update the relationship
-        case Repo.update(company) do
-          {:ok, _company} ->
-            conn
-            |> put_flash(:info, "Company joined successfully")
-            |> redirect(to: ticket_path(conn, :index), user: user)
-          {:error, changeset} -> 
-            render(conn, "join.html", changeset: changeset)
-        end
-          # My console steps to do the same thing
-          # user = Repo.get_by!(User, id: 3)
-          # user = Repo.preload(user, :company)
-          # company = Repo.get_by!(Company, id: 1)
-          # user = Ecto.build_assoc(company, :users, Map.from_struct user)
-          # user = Repo.update!(user)
-      end
+    company = 
+      Repo.get!(Company, company_id)
+      |> Ecto.build_assoc(:users, Map.from_struct user)
+
+    case Repo.update(company) do
+      {:ok, _company} ->
+        conn
+        |> put_flash(:info, "Company joined successfully")
+        |> redirect(to: ticket_path(conn, :index), user: user)
+      {:error, changeset} -> 
+        render(conn, "join.html", changeset: changeset)
+    end
   end
   # Function to look up users for the given company
   defp company_users(company) do
@@ -138,4 +131,28 @@ defmodule Discovery.CompanyController do
   defp user_company(user) do
     assoc(user, :company)
   end
+
+  def user_in_company(conn, _opts) do
+    if conn.params["id"] == to_string(conn.assigns.current_user.company_id) do
+      conn
+    else
+      conn
+       |> put_flash(:error, "Error, You do not have access do this")
+       |> redirect(to: user_path(conn, :index))
+       |> halt()  
+    end
+  end
+
+  #For now, no regular user has access to view all of the companies
+  def access_all_companies(conn, _opts) do
+    if(to_string(conn.assigns.current_user.role) == "God") do
+      conn
+    else
+      conn
+       |> put_flash(:error, "Error, You do not have access do this")
+       |> redirect(to: Discovery.Router.Helpers.page_path(conn, :index))
+       |> halt()  
+    end
+  end
+
 end

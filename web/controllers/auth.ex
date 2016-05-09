@@ -45,7 +45,7 @@ defmodule Discovery.Auth do
 				{:error, :not_found, conn}
 		end
 	end
-
+	
 	import Phoenix.Controller
 	alias Discovery.Router.Helpers
 
@@ -57,6 +57,16 @@ defmodule Discovery.Auth do
 			|> put_flash(:error, "Error, You must be logged in to access this page")
 			|> redirect(to: Helpers.session_path(conn, :new))
 			|> halt()
+		end
+	end
+	# Locks down functionality that logged in users should access i.e. Registration
+	def authenticated_not_allowed(conn, _opts) do
+		if conn.assigns.current_user do
+			conn
+			|> redirect(to: Helpers.ticket_path(conn, :index))
+			|> halt()
+		else
+			conn
 		end
 	end
 end

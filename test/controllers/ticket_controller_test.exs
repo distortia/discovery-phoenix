@@ -3,7 +3,7 @@ defmodule Discovery.TicketControllerTest do
 
   alias Discovery.Ticket
 
-  @valid_attrs %{title: "Ticket title", body: "ticket body"}
+  @valid_attrs %{title: "Ticket title", body: "ticket body", assigned_to: "#{1}"}
   @invalid_attrs %{title: "invalid"}
 
   # Get the count of all the tickets in the db
@@ -11,7 +11,7 @@ defmodule Discovery.TicketControllerTest do
 
   setup %{conn: conn} = config do
     if email = config[:login_as] do
-      user = insert_user(email: "unittest@unittest.com", first_name: "unit", last_name: "test", password: "123123")
+      user = insert_user(email: "unittest@unittest.com", first_name: "unit", last_name: "test", password: "Val1dP@ass")
       conn = assign(conn(), :current_user, user)
       {:ok, conn: conn, user: user}
     else
@@ -21,8 +21,8 @@ defmodule Discovery.TicketControllerTest do
 
   @tag login_as: "unittest@unittest.com"
   test "GET /tickets will show tickets for the user", %{conn: conn, user: user} do
-    ticket  = insert_ticket(user, title: "unit test ticket", body: "unit test body")
-    other_ticket = insert_ticket(insert_user(email: "otherunittest@unittest.com"), title: "another ticket", body: "mticket")
+    ticket  = insert_ticket(user, title: "unit test ticket", body: "unit test body", assigned_to: "#{user.id}")
+    other_ticket = insert_ticket(insert_user(email: "otherunittest@unittest.com"), title: "another ticket", body: "mticket", assigned_to: "1")
 
     conn = get conn, ticket_path(conn, :index)
     assert html_response(conn, 200) =~ ~r/Listing tickets/
@@ -38,14 +38,14 @@ defmodule Discovery.TicketControllerTest do
   end
 
   @tag login_as: "unittest@unittest.com"
-  test "does not create ticket and renders errors when invalid", %{conn: conn} do
+  test "Does not create ticket and renders errors when invalid", %{conn: conn, user: user} do
     count_before = ticket_count(Ticket)
     conn = post conn, ticket_path(conn, :create), ticket: @invalid_attrs
     assert html_response(conn, 200) =~ "check the errors"
     assert ticket_count(Ticket) == count_before
   end
 
-  test "Redirect from /tickets to index with error", %{conn: conn} do
+  test "Redirect from /tickets to index with error when not logged in", %{conn: conn} do
     Enum.each([
       get(conn, company_path(conn, :index)),
       get(conn, company_path(conn, :show, "1")),

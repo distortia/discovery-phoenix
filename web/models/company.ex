@@ -6,7 +6,8 @@ defmodule Discovery.Company do
 
   schema "companies" do
     field :name, :string
-    
+    field :unique_id, :string
+    field :company_tags, {:array, :string}, default: []
     has_many :users, User
     # Sets up the user ticket company relationship
     has_many :user_tickets, through: [:users, :tickets]
@@ -15,7 +16,7 @@ defmodule Discovery.Company do
   end
 
   @required_fields ~w(name)
-  @optional_fields ~w()
+  @optional_fields ~w(company_tags)
 
   @doc """
   Creates a changeset based on the `model` and `params`.

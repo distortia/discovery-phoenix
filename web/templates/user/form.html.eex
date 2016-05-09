@@ -24,10 +24,31 @@
   </div>
 
   <div class="form-group">
-    <%= label f, :password, class: "control-label" %>
+    <label for="password">Password must contain: 8+ characters, 1 uppercase, 1 lowercase, 1 special character !@#$%^&+=</label>
     <%= text_input f, :password, class: "form-control" %>
     <%= error_tag f, :password %>
   </div>
+
+  <div class="form-group">
+    <%= if assigns[:currentUser] do %>
+      <%= if @currentUser.role == "Owner" do %>
+        <%= label f, :role, class: "control-label" %>
+        <%= select f, :role, ["User","Admin","Owner"], class: "form-control" %>
+        <%= error_tag f, :role %>      
+      <% end %>
+      <%= if @currentUser.role  == "Admin" do %>
+        <%= label f, :role, class: "control-label" %>
+        <%= select f, :role, ["User","Admin"], class: "form-control" %>
+        <%= error_tag f, :role %>      
+      <% end %>
+    <%= else %>
+        <%= label f, :role, class: "control-label" %>
+        <%= select f, :role, ["User","Admin","Owner"], class: "form-control" %>
+        <%= error_tag f, :role %>
+    <%= end %>
+  </div>
+
+  <%= hidden_input f, :unique_company_id, value: @unique_company_id %>
 
   <div class="form-group">
     <%= submit "Submit", class: "btn btn-primary" %>

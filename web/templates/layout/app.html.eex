@@ -8,7 +8,19 @@
     <meta name="author" content="">
 
     <title>Hello Discovery!</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
     <link rel="stylesheet" href="<%= static_path(@conn, "/css/app.css") %>">
+
+    <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-56399673-8', 'auto');
+    ga('send', 'pageview');
+
+  </script>
   </head>
 
   <body>
@@ -17,13 +29,15 @@
         <nav role="navigation">
           <ol class="breadcrumb text-right">
             <%= if @current_user do %>
-              <li><%= @current_user.email %></li>
+              <li><%= link "My Account", to: user_path(@conn, :edit, @current_user) %></li>
+              <li><%= link "Home", to: page_path(@conn, :index) %></li>
               <li><%= link "Users", to: user_path(@conn, :index) %></li>
               <li><%= link "Tickets", to: ticket_path(@conn, :index) %></li>
-              <li><%= link "Company", to: company_path(@conn, :index) %></li>
+              <%= if @current_user.company_id do %>
+                <li><%= link "Company", to: company_path(@conn, :show, @current_user.company_id) %></li>
+              <% end %>
               <li><%= link "Log Out", to: session_path(@conn, :delete, @current_user), method: "delete" %></li>
             <% else %>
-              <li><%= link "Register", to: user_path(@conn, :new) %></li>
               <li><%= link "Log In", to: session_path(@conn, :new) %></li>
             <% end %>
           </ol>
@@ -39,6 +53,8 @@
       </main>
 
     </div> <!-- /container -->
+    <script src="https://code.jquery.com/jquery-2.2.3.min.js" integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo=" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
     <script src="<%= static_path(@conn, "/js/app.js") %>"></script>
   </body>
 </html>

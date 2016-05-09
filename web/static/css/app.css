@@ -76,3 +76,52 @@ form.link, form.button {
     border-bottom: 0;
   }
 }
+
+.container-login {
+    margin: 50px, auto;
+    width: 640px;
+}
+
+.login:before {
+   content: '';
+   position: absolute;
+   top: -8px;
+   right: -8px;
+   bottom: -15px;
+   left: -8px;
+   z-index: -1;
+   background: #8A5B83;
+   border-radius: 20px;
+}
+
+.login {
+    position: relative;
+    margin: 0 auto;
+    padding: 20px 20px 20px;
+    width: 310px;
+}
+
+.login h1 {
+  margin: -20px -20px 21px;
+  line-height: 60px;
+  font-size: 40px;
+  font-weight: bold;
+  color: #524549;
+  text-align: center;
+  border-bottom: 1px solid #cfcfcf;
+  border-radius: 3px 3px 0 0;
+}
+
+.btn-login {
+  padding: 0 18px;
+  height: 29px;
+  font-size: 15px;
+  font-weight: bold;
+  color: #fff;
+  background: #524549;
+  border: 1px solid;
+  border-radius: 6px;
+  float: right;
+  text-transform: uppercase;
+}
+

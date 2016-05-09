@@ -14,10 +14,28 @@ defmodule Discovery.Router do
     pipe_through :browser # Use the default browser stack
 
     get "/", PageController, :index
-    # Sessions is our login controller
+    # Sessions is our login controller:o
     resources "/sessions", SessionController, only: [:new, :create, :delete]
-    # Keep the ability to register open
-    resources "/users", UserController, only: [:new, :create]
+  end
+
+  # Unauthenticated user actions
+  scope "/users", Discovery do
+    pipe_through [:browser]
+
+    # Password Reset
+    get "/reset", UserController, :reset
+    post "/reset", EmailController, :reset
+    get "/reset/:auth_id", UserController, :new_password
+    post "/reset/update", UserController, :update_password
+  end
+
+  scope "/users", Discovery do
+    pipe_through [:browser, :authenticated_not_allowed]
+    # Create a user
+    get "/new", UserController, :new_redirect # Graceful fallback
+    get "/new/:unique_company_id", UserController, :new_redirect # Graceful fallback
+    get "/new/:unique_company_id/:token", UserController, :new
+    post "/", UserController, :create
   end
 
   # Added scope to the routes for the authentication middleware
@@ -30,10 +48,17 @@ defmodule Discovery.Router do
   # Companies router + middleware
   scope "/companies", Discovery do
     pipe_through [:browser, :authenticate_user]
-    get "/join", CompanyController, :join
-    post "/join", CompanyController, :join_company
+    # get "/join", CompanyController, :join
+    get "/join", CompanyController, :join_company
     resources "/", CompanyController, except: [:join]
   end
+
+# Random Authenticated Routes
+scope "/", Discovery do
+  pipe_through [:browser, :authenticate_user]
+
+  post "/invite/:company", EmailController, :invite # Sends email for invitation
+end
   
   # Tickets router + middleware
   scope "/tickets", Discovery do

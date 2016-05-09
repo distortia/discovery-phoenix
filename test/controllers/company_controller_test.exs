@@ -6,6 +6,7 @@ defmodule Discovery.CompanyControllerTest do
   setup %{conn: conn} = config do
     if email = config[:login_as] do
       user = insert_user(email: "unittest@unittest.com", first_name: "unit", last_name: "test", password: "123123")
+      company = insert_company(name: "testComp")
       conn = assign(conn(), :current_user, user)
       {:ok, conn: conn, user: user}
     else

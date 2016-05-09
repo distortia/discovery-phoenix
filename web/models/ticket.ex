@@ -9,11 +9,13 @@ defmodule Discovery.Ticket do
     field :body, :string
     field :resolution, :string
     field :created_on, :string
-    field :severity, {:array, :integer}
+    field :severity, :string, default: "Normal"
     field :updated_on, :string
-    field :tags, {:array, :string}
-    field :status, {:array, :string}
+    field :tags, {:array, :string}, default: []
+    field :status, :string, default: "Open"
     field :created_by, :string
+    field :assigned_to, :string
+    field :assigned_to_name, :string
 
     # Set relationship to user
     belongs_to :user, User
@@ -21,8 +23,8 @@ defmodule Discovery.Ticket do
     timestamps
   end
 
-  @required_fields ~w(title body)
-  @optional_fields ~w(resolution tags)
+  @required_fields ~w(title body assigned_to)
+  @optional_fields ~w(resolution tags status severity assigned_to_name)
 
   @doc """
   Creates a changeset based on the `model` and `params`.

@@ -3,7 +3,7 @@ defmodule Discovery.CompanyTest do
 
   alias Discovery.Company
 
-  @valid_attrs %{name: "some content"}
+  @valid_attrs %{name: "Cool Company"}
   @invalid_attrs %{}
 
   test "changeset with valid attributes" do
