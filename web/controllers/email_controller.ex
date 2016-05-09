@@ -47,33 +47,36 @@ defmodule Discovery.EmailController do
 			|> redirect(to: company_path(conn, :show, company.id))
 		end
 	end
-
+	# Will always return a successful response to deter email phishing
 	def reset(conn, %{"reset_form" => reset_params}) do
 		# Get email from the form
 		email = reset_params["email"]
 		# Generate random number of length 10
 		random_auth_id = random_string(10)
 		# Get our user
-		user = 
-		Repo.get_by!(User, email: email)
-		# Update the changeset to add the auth id
-		|> Ecto.Changeset.change(auth_id: random_auth_id)
-
-		case Repo.update(user) do
-			{:ok, _user} ->
-				# Send the email
-				link = "http://localhost:4000/users/reset/#{random_auth_id}"
-				Email.reset_password_email(email, link)
-				|> Mailer.deliver_later
-
-				conn
+		case Repo.one(User, email: email) do
+			nil -> 
+				# do nothing
+				conn 
 				|> put_flash(:info, "Reset password instructions have been sent to #{email}")
-				|> redirect(to: user_path(conn, :reset)) 
-		
-			{:error, _error} ->
-				conn
-				|> put_flash(:error, "Something went wrong, please contact support and try again")
 				|> redirect(to: user_path(conn, :reset))
+			_ -> 
+			user = 
+			Repo.get_by!(User, email: email)
+			# Update the changeset to add the auth id
+			|> Ecto.Changeset.change(auth_id: random_auth_id)
+
+			case Repo.update(user) do
+				{:ok, _user} ->
+					# Send the email
+					link = "http://localhost:4000/users/reset/#{random_auth_id}"
+					Email.reset_password_email(email, link)
+					|> Mailer.deliver_later
+
+					conn
+					|> put_flash(:info, "Reset password instructions have been sent to #{email}")
+					|> redirect(to: user_path(conn, :reset)) 
+			end
 		end
 	end
 

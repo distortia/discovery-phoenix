@@ -145,4 +145,19 @@ defmodule Discovery.EmailControllerTest do
 
 		assert_delivered_email(sent_email)	
 	end
+
+	test "Reset password - happy path", %{conn: conn} do
+		email = "test@test.com"
+		insert_user(email: email)
+		conn = post conn, email_path(conn, :reset), reset_form: %{"email" => email}
+		assert get_flash(conn, :info) == "Reset password instructions have been sent to #{email}"
+		assert redirected_to(conn) == user_path(conn, :reset)
+	end
+
+	test "Reset password - User doesn't exist or invalid email", %{conn: conn} do
+		email = "noone@test.com"
+		conn = post conn, email_path(conn, :reset), reset_form: %{"email" => email}
+		assert get_flash(conn, :info) == "Reset password instructions have been sent to #{email}"
+		assert redirected_to(conn) == user_path(conn, :reset)
+	end
 end
