@@ -28,3 +28,6 @@ config :phoenix, :generators,
   migration: true,
   binary_id: false
 
+config :trello,
+  secret: {:system, "TRELLO_KEY"}
+
