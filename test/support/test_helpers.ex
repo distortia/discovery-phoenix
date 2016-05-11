@@ -1,7 +1,7 @@
 defmodule Discovery.TestHelpers do
   alias Discovery.Repo
   alias Discovery.User
-
+  alias Discovery.Company
   def insert_user(attrs \\ %{}) do
     changes = Dict.merge(%{
       first_name: "Unit",
@@ -36,5 +36,15 @@ defmodule Discovery.TestHelpers do
     %Discovery.Company{}
     |> Discovery.Company.changeset(changes)
     |> Repo.insert!()
+  end
+
+  def join_company(user, company) do
+    user = Repo.preload(user, :company)
+
+    company = 
+    Repo.get!(Company, company.id)
+    |> Ecto.build_assoc(:users, Map.from_struct user)
+
+    Repo.update(company)
   end
 end

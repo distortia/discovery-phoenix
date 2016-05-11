@@ -12,6 +12,7 @@ defmodule Discovery.TicketControllerTest do
   setup %{conn: conn} = config do
     if email = config[:login_as] do
       user = insert_user(email: "unittest@unittest.com", first_name: "unit", last_name: "test", password: "Val1dP@ass")
+      company = join_company(user, insert_company())
       conn = assign(conn(), :current_user, user)
       {:ok, conn: conn, user: user}
     else
@@ -31,16 +32,28 @@ defmodule Discovery.TicketControllerTest do
   end
 
   @tag login_as: "unittest@unittest.com"
-  test "Create ticket and redirect", %{conn: conn, user: user} do
-    conn = post conn, ticket_path(conn, :create), ticket: @valid_attrs
+  test "Create ticket and redirect - assigned to self", %{conn: conn, user: user} do
+    ticket_params = %{title: "Ticket title", body: "ticket body", assigned_to: "#{user.id}"}
+    conn = post conn, ticket_path(conn, :create), ticket: ticket_params, user: user
     assert redirected_to(conn) == ticket_path(conn, :index)
-    assert Repo.get_by!(Ticket, @valid_attrs).user_id == user.id
+    assert  get_flash(conn, :info) == "Ticket created successfully"
+    assert Repo.get_by!(Ticket, ticket_params).user_id == user.id
+  end
+
+  @tag login_as: "unittest@unittest.com"
+  test "Create ticket and redirect - assigned to another user", %{conn: conn, user: user} do
+    other_user = insert_user(email: "other@user.com")
+    ticket_params = %{title: "Ticket title", body: "ticket body", assigned_to: "#{other_user.id}"}
+    conn = post conn, ticket_path(conn, :create), ticket: ticket_params, user: "unittest@unittest.com"
+    assert redirected_to(conn) == ticket_path(conn, :index)
+    assert  get_flash(conn, :info) == "Ticket created successfully"
+    assert Repo.get_by!(Ticket, ticket_params).user_id == other_user.id
   end
 
   @tag login_as: "unittest@unittest.com"
   test "Does not create ticket and renders errors when invalid", %{conn: conn, user: user} do
     count_before = ticket_count(Ticket)
-    conn = post conn, ticket_path(conn, :create), ticket: @invalid_attrs
+    conn = post conn, ticket_path(conn, :create), ticket: %{title: "invalid", assigned_to: "#{user.id}"}, user: "unittest@unittest.com"
     assert html_response(conn, 200) =~ "check the errors"
     assert ticket_count(Ticket) == count_before
   end
