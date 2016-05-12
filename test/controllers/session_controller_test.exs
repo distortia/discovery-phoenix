@@ -15,6 +15,6 @@ defmodule Discovery.SessionControllerTest do
 
   test "GET /session/new", %{conn: conn} do
       conn = get conn, "/sessions/new"
-      assert html_response(conn, 200) =~ "Login"
+      assert html_response(conn, 200) =~ "Welcome"
   end
 end
