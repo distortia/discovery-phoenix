@@ -8,7 +8,6 @@ defmodule Discovery.TicketTest do
 
   test "changeset with valid attributes" do
     changeset = Ticket.changeset(%Ticket{}, @valid_attrs)
-    IO.inspect changeset.errors
     assert changeset.valid?
   end
 
