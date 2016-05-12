@@ -1,0 +1,12 @@
+{
+	"skip_files": [
+		"lib",
+		"test",
+		"web/web.ex",
+		"web/router.ex",
+		"web/gettext.ex"
+	],
+	"coverage_options": {
+		"treat_no_relevant_lines_as_covered": true
+	}
+}
