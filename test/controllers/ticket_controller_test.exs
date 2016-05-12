@@ -4,6 +4,7 @@ defmodule Discovery.TicketControllerTest do
   alias Discovery.Ticket
 
   @valid_attrs %{title: "Ticket title", body: "ticket body", assigned_to: "#{1}"}
+  @valid_attrs_with_nil_tags %{title: "Ticket title", body: "ticket body", assigned_to: "#{1}", tags: nil}
   @invalid_attrs %{title: "invalid"}
 
   # Get the count of all the tickets in the db
@@ -72,5 +73,64 @@ defmodule Discovery.TicketControllerTest do
        assert redirected_to(conn, 302) =~ "/sessions/new"
        assert get_flash(conn, :error) == "Error, You must be logged in to access this page"
      end)
+  end
+
+  @tag login_as: "unittest@unittest.com"
+  test "New Ticket view when logged in", %{conn: conn, user: user} do
+    conn = get conn, ticket_path(conn, :new), user: user
+    assert html_response(conn, 200) =~ "New ticket"
+  end
+
+  @tag login_as: "unittest@unittest.com"
+  test "Show ticket view when logged in", %{conn: conn, user: user} do
+    ticket = insert_ticket(user, @valid_attrs)
+    conn = get conn, ticket_path(conn, :show, ticket.id), user: user
+    assert html_response(conn, 200) =~ "Show ticket"
+    assert html_response(conn, 200) =~ @valid_attrs.title
+  end  
+
+  @tag login_as: "unittest@unittest.com"
+  test "Edit ticket view when logged in", %{conn: conn, user: user} do
+    ticket = insert_ticket(user, @valid_attrs)
+    conn = get conn, ticket_path(conn, :edit, ticket.id), user: user
+    assert html_response(conn, 200) =~ "Edit ticket"
+    assert html_response(conn, 200) =~ @valid_attrs.title
+  end
+
+  @tag login_as: "unittest@unittest.com"
+  test "Update ticket view when logged in", %{conn: conn, user: user} do
+    ticket = insert_ticket(user, @valid_attrs)
+    updates = %{"ticket" => %{title: "Updated title"}}
+    conn = put conn, ticket_path(conn, :update, ticket.id, updates), user: user
+    assert get_flash(conn, :info) == "Ticket updated successfully"
+    assert redirected_to(conn, 302) == ticket_path(conn, :index)
+  end  
+
+  @tag login_as: "unittest@unittest.com"
+  test "Update ticket view when logged in - invalid changeset", %{conn: conn, user: user} do
+    ticket = insert_ticket(user, @valid_attrs)
+    updates = %{"ticket" => %{title: ""}}
+    conn = put conn, ticket_path(conn, :update, ticket.id, updates), user: user
+    assert html_response(conn, 200) =~ "Oops, something went wrong! Please check the errors below."
+  end  
+
+  @tag login_as: "unittest@unittest.com"
+  test "Update ticket view when logged in - new user", %{conn: conn, user: user} do
+    ticket = insert_ticket(user, @valid_attrs)
+    other_user = insert_user(email: "other@user.com")
+    updates = %{"ticket" => %{assigned_to: other_user.id}}
+    conn = put conn, ticket_path(conn, :update, ticket.id, updates), user: user
+    assert get_flash(conn, :info) == "Ticket updated successfully"
+    assert redirected_to(conn, 302) == ticket_path(conn, :index)
+  end
+
+  @tag login_as: "unittest@unittest.com"
+  test "Delete ticket view when logged in", %{conn: conn, user: user} do
+    count_before = ticket_count(Ticket)
+    ticket = insert_ticket(user, @valid_attrs)
+    conn = delete conn, ticket_path(conn, :delete, ticket.id), user: user
+    assert ticket_count(Ticket) == count_before
+    assert get_flash(conn, :info) == "Ticket Deleted!"
+    assert redirected_to(conn, 302) == ticket_path(conn, :index)
   end
 end
