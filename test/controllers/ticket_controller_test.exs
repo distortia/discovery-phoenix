@@ -11,10 +11,12 @@ defmodule Discovery.TicketControllerTest do
 
   setup %{conn: conn} = config do
     if email = config[:login_as] do
-      user = insert_user(email: "unittest@unittest.com", first_name: "unit", last_name: "test", password: "Val1dP@ass")
-      company = join_company(user, insert_company())
+      company = insert_company()
+      {:ok, user} = 
+      insert_user(email: "unittest@unittest.com", first_name: "unit", last_name: "test", password: "Val1dP@ass")
+      |> join_company(company)
       conn = assign(conn(), :current_user, user)
-      {:ok, conn: conn, user: user}
+      {:ok, conn: conn, user: user, company: company}
     else
       :ok
     end
@@ -53,7 +55,7 @@ defmodule Discovery.TicketControllerTest do
   @tag login_as: "unittest@unittest.com"
   test "Does not create ticket and renders errors when invalid", %{conn: conn, user: user} do
     count_before = ticket_count(Ticket)
-    conn = post conn, ticket_path(conn, :create), ticket: %{title: "invalid", assigned_to: "#{user.id}"}, user: "unittest@unittest.com"
+    conn = post conn, ticket_path(conn, :create), ticket: %{title: "invalid", assigned_to: user.id, tags: []}, user: user
     assert html_response(conn, 200) =~ "check the errors"
     assert ticket_count(Ticket) == count_before
   end
