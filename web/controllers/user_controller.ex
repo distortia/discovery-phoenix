@@ -45,21 +45,11 @@ defmodule Discovery.UserController do
     Repo.get!(User, id)
     |> Repo.preload(:company)
 
-    # We have to check for nil here before doing any sort of query
-    # Its an elixir/phoenix thing.
-    if is_nil(user.company_id) do
-      # If the user doesnt have a company id
-      # we can throw in anything into the view to be rendered to @company in the template
-      conn
-        |> assign(:company, "None")
-        |> render("show.html", user: user)
-    else
-      # We found a user with a company and want to return the company name to the template
-      company = Repo.get_by(Discovery.Company, id: user.company_id)
-      conn 
-        |> assign(:company, company)
-        |> render("show.html", user: user)
-    end
+    # We found a user with a company and want to return the company name to the template
+    company = Repo.get_by(Discovery.Company, id: user.company_id)
+    conn 
+      |> assign(:company, company)
+      |> render("show.html", user: user)
   end
 
   def edit(conn, %{"id" => id}) do
@@ -82,7 +72,7 @@ defmodule Discovery.UserController do
     end
     changeset = User.update_changeset(user, user_params)
     case Repo.update(changeset) do
-      {:ok, user} ->
+      {:ok, _user} ->
         conn
         |> put_flash(:info, "User updated successfully.")
         |> redirect(to: user_path(conn, :show, user))

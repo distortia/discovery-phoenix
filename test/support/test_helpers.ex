@@ -30,7 +30,8 @@ defmodule Discovery.TestHelpers do
   def insert_company(attrs \\ %{}) do
   	changes = Dict.merge(%{
       name: "UnitTestComp",
-      unique_id: "123"
+      unique_id: "#{Base.encode16(:crypto.rand_bytes(8))}",
+      company_tags: [],
       }, attrs)
 
     %Discovery.Company{}

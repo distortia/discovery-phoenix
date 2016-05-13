@@ -16,7 +16,7 @@ defmodule Discovery.Company do
   end
 
   @required_fields ~w(name)
-  @optional_fields ~w(company_tags)
+  @optional_fields ~w(company_tags unique_id)
 
   @doc """
   Creates a changeset based on the `model` and `params`.
