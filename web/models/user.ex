@@ -28,6 +28,8 @@ defmodule Discovery.User do
   def changeset(model, params \\ :empty) do
     model
     |> cast(params, ~w(first_name last_name role), ~w(auth_id))
+    |> validate_length(:first_name, min: 1)
+    |> validate_length(:last_name, min: 1)
     |> email_changeset(params)
   end
 

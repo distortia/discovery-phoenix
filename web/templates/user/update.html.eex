@@ -4,7 +4,9 @@
 <%= form_for @conn, user_path(@conn, :update_password), [as: :update_form], fn f -> %>
 	<div class="form-group">
 		<label>
-			Password: <%= text_input f, :password, placeholder: "Password" %>
+		    <%= label f, :password, class: "control-label" %>
+    		<%= text_input f, :password, class: "form-control" %>
+		    <%= error_tag f, :password %>
 		</label>
 	</div>
 	<%= hidden_input f, :auth_id, value: @auth_id %>
