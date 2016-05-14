@@ -50,7 +50,8 @@ defmodule Discovery.Router do
     pipe_through [:browser, :authenticate_user]
     # get "/join", CompanyController, :join
     get "/join", CompanyController, :join_company
-    resources "/", CompanyController, except: [:join]
+    get "/github_link", CompanyController, :github_link
+    resources "/", CompanyController, except: [:join, :github_link]
   end
 
 # Random Authenticated Routes

@@ -57,7 +57,7 @@ defmodule Discovery.CompanyController do
         user = Repo.preload(user, :tickets)
         user.tickets
        end
-     tickets = List.flatten(tickets)
+    tickets = List.flatten(tickets)
     # I passed users/tickets as their own thing to the view for ease of use
     render(conn, "show.html", company: company, users: company.users, tickets: tickets)
   end
@@ -123,6 +123,40 @@ defmodule Discovery.CompanyController do
         render(conn, "join.html", changeset: changeset)
     end
   end
+
+  #Redirect route called from Github.  Used to process and save oauth token
+  def github_link(conn, _placehoder, user) do
+    company = Repo.get!(Company, user.company_id)
+    if(conn.params["code"]) do
+        case Discovery.GitHub.create_oauth(conn.params["code"]) do
+          :error -> conn|> put_flash(:error, "There was an error in the request, please try again")|> redirect(to: user_path(conn, :index))|> halt() 
+          response ->
+            access_token = String.split(response.body, "access_token=")
+            oauth_tokens = 
+              case company.oauth_tokens do
+                nil -> %{}
+                _ -> company.oauth_tokens
+              end
+            new_oauth = Map.merge(oauth_tokens, %{github: List.last(access_token)})
+            params = %{"name" => company.name, "oauth_tokens" => new_oauth}
+            changeset = Company.changeset(company, params)
+            case Repo.update(changeset) do
+              {:ok, company} ->
+                conn
+                |> put_flash(:info, "Company updated successfully.")
+                |> redirect(to: company_path(conn, :show, company))
+              {:error, changeset} ->
+                render(conn, "edit.html", company: company, changeset: changeset)
+            end          
+        end
+    else
+      conn
+       |> put_flash(:error, "There was an error in the request, please try again")
+       |> redirect(to: user_path(conn, :index))
+       |> halt()  
+    end
+  end
+
   # Function to look up users for the given company
   defp company_users(company) do
     assoc(company, :users)
