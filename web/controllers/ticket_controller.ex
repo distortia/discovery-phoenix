@@ -126,11 +126,22 @@ defmodule Discovery.TicketController do
     accounts = []
     if company.oauth_tokens["github"] do
       response = Discovery.GitHub.get_repos(company.oauth_tokens["github"])
-      tmp = []
-      decoded_list = Poison.decode!((to_string(response.body)), as: tmp)
-      repo_details = for repo <- decoded_list, repo["owner"] do %{"name" => repo["name"], "owner"=> repo["owner"]["login"]} end
-      github_account = [%{"github" => repo_details}]
-      accounts = accounts ++ github_account
+      case response do
+        :error -> conn|> put_flash(:error, "Error Fetching Github Repos")|> redirect(to: company_path(conn, :show, company))|> halt()
+        _->
+          tmp = []
+          decoded_list = Poison.decode!((to_string(response.body)), as: tmp)
+          if(is_map(decoded_list)) do
+            conn|> put_flash(:error, "Error Fetching GitHub Repos (Did you revoke the OAuth? If so, please unlink your Github account)")|> redirect(to: company_path(conn, :show, company))|> halt()
+          end
+          repo_details = 
+            case length(decoded_list) do
+              0 -> []
+              _ -> for repo <- decoded_list, repo["owner"] do %{"name" => repo["name"], "owner"=> repo["owner"]["login"]} end
+            end
+          github_account = [%{"github" => repo_details}]
+          accounts = accounts ++ github_account
+      end
     end
     render(conn, "export.html", ticket: ticket, user: user, accounts: accounts)
   end
@@ -140,8 +151,14 @@ defmodule Discovery.TicketController do
     ticket = Repo.get!(Ticket, id)
     details_split = String.split(details, ":")
     case Discovery.GitHub.create_issue(company.oauth_tokens["github"], List.last(details_split), List.first(details_split), ticket.title, ticket.body) do
-      :error -> conn|>put_flash(:error, "There was an error in the request, please try again")|> redirect(to: ticket_path(conn, :export))|> halt()
-      response -> conn|>put_flash(:info, "Issue Created")|> redirect(to: ticket_path(conn, :index))
+      :error -> conn|>put_flash(:error, "There was an error in the request, please try again")|> redirect(to: ticket_path(conn, :export, ticket))|> halt()
+      response -> 
+        tmp = %{}
+        decoded_map = Poison.decode!((to_string(response.body)), as: tmp)
+        if(Map.has_key?(decoded_map, "message") or Map.has_key?(decoded_map, "documentation_url")) do
+          conn|>put_flash(:error, "There was an error in the request, please try again")|> redirect(to: ticket_path(conn, :export, ticket))|> halt()
+        end
+        conn|>put_flash(:info, "Issue Created")|> redirect(to: company_path(conn, :show, company))
     end
   end
 

@@ -13,14 +13,16 @@
       <%= if account["github"] do %>
         <tr>
     	  <td>GitHub</td>
-    	  <td>
-    	    <select id="repo_name" class="form-control">
-	    	  <%= for details <- account["github"] do %>
-                <option value=<%= raw to_string(details["name"] <> ":" <> details["owner"]) %>><%= details["name"] %></option>
-	    	  <% end %>
-    	    </select>
+        <%= if length(account["github"]) > 0 do %>
+    	    <td>
+    	      <select id="repo_name" class="form-control">
+	    	    <%= for details <- account["github"] do %>
+              <option value='<%= raw to_string(details["name"] <> ":" <> details["owner"]) %>'><%= details["name"] %></option>
+	    	    <% end %>
+    	      </select>
           </td>
-    	  <td><button class="btn btn-default btn-md" type="button" onclick="githubExport(<%= raw to_string(@ticket.id)%>)">Export to GitHub</button></td>
+    	    <td><a id="export_github_link" href='/tickets/<%= raw to_string(@ticket.id) %>/github_export?details='><button class="btn btn-default btn-md" type="button">Export to GitHub</button></a></td>
+        <% end %>
         </tr>
       <% end %>
     <% end %>

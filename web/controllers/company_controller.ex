@@ -129,9 +129,12 @@ defmodule Discovery.CompanyController do
     company = Repo.get!(Company, user.company_id)
     if(conn.params["code"]) do
         case Discovery.GitHub.create_oauth(conn.params["code"]) do
-          :error -> conn|> put_flash(:error, "There was an error in the request, please try again")|> redirect(to: user_path(conn, :index))|> halt() 
+          :error -> conn|> put_flash(:error, "There was an error in the request, please try again")|> redirect(to: company_path(conn, :show, company))|> halt() 
           response ->
             access_token = String.split(response.body, "access_token=")
+            if(length(access_token) == 1) do
+              conn|> put_flash(:error, "Error Linking Account. Please contact support")|> redirect(to: company_path(conn, :show, company))|> halt() 
+            end
             oauth_tokens = 
               case company.oauth_tokens do
                 nil -> %{}
@@ -152,7 +155,7 @@ defmodule Discovery.CompanyController do
     else
       conn
        |> put_flash(:error, "There was an error in the request, please try again")
-       |> redirect(to: user_path(conn, :index))
+       |> redirect(to: company_path(conn, :show, company))
        |> halt()  
     end
   end
