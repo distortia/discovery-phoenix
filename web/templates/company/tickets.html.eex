@@ -25,6 +25,7 @@
         <%= link "Show", to: ticket_path(@conn, :show, ticket), class: "btn btn-default btn-xs" %>
         <%= link "Edit", to: ticket_path(@conn, :edit, ticket), class: "btn btn-default btn-xs" %>
         <%= link "Delete", to: ticket_path(@conn, :delete, ticket), method: :delete, data: [confirm: "Are you sure?"], class: "btn btn-danger btn-xs" %>
+        <%= link "Export", to: ticket_path(@conn, :export, ticket), class: "btn btn-default btn-xs" %>
       </td>
     </tr>
 <% end %>

@@ -8,4 +8,20 @@ defmodule Discovery.GitHub do
 		end
 	end
 	
+	def get_repos(code) do
+		response = HTTPoison.get "https://api.github.com/user/repos?access_token=#{code}", [{"User-Agent", "Elixir"}]
+		case response do 
+			{:ok, response} -> response
+			_ -> :error
+		end
+	end 
+
+	def create_issue(code, owner, repo, name, body) do
+		post_body = %{"title" => name, "body"=>body}
+		response = HTTPoison.post "https://api.github.com/repos/#{owner}/#{repo}/issues?access_token=#{code}", Poison.encode!(post_body)
+		case response do
+			{:ok, response} -> response
+			_ -> :error
+		end
+	end
 end 

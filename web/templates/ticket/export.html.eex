@@ -1,0 +1,28 @@
+<%= render "show.html", conn: @conn, ticket: @ticket%>
+<meta name="csrf" content="<%= Plug.CSRFProtection.get_csrf_token() %>">
+<table class="table">
+  <thead>
+  	 <tr>
+      <th>Service</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <%= for account <- @accounts do %>
+      <%= if account["github"] do %>
+        <tr>
+    	  <td>GitHub</td>
+    	  <td>
+    	    <select id="repo_name" class="form-control">
+	    	  <%= for details <- account["github"] do %>
+                <option value=<%= raw to_string(details["name"] <> ":" <> details["owner"]) %>><%= details["name"] %></option>
+	    	  <% end %>
+    	    </select>
+          </td>
+    	  <td><button class="btn btn-default btn-md" type="button" onclick="githubExport(<%= raw to_string(@ticket.id)%>)">Export to GitHub</button></td>
+        </tr>
+      <% end %>
+    <% end %>
+  </tbody>
+</table>

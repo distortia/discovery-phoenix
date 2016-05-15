@@ -64,6 +64,8 @@ end
   # Tickets router + middleware
   scope "/tickets", Discovery do
     pipe_through [:browser, :authenticate_user]
-    resources "/", TicketController
+    get "/:id/export", TicketController, :export
+    post "/:id/github_export", TicketController, :github_export
+    resources "/", TicketController, except: [:export, :github_export]
   end
 end

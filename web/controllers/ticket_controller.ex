@@ -120,6 +120,31 @@ defmodule Discovery.TicketController do
     |> redirect(to: ticket_path(conn, :index))
   end
 
+  def export(conn, %{"id" => id}, user) do
+    company = Repo.get!(Company, user.company_id)
+    ticket = Repo.get!(Ticket, id)
+    accounts = []
+    if company.oauth_tokens["github"] do
+      response = Discovery.GitHub.get_repos(company.oauth_tokens["github"])
+      tmp = []
+      decoded_list = Poison.decode!((to_string(response.body)), as: tmp)
+      repo_details = for repo <- decoded_list, repo["owner"] do %{"name" => repo["name"], "owner"=> repo["owner"]["login"]} end
+      github_account = [%{"github" => repo_details}]
+      accounts = accounts ++ github_account
+    end
+    render(conn, "export.html", ticket: ticket, user: user, accounts: accounts)
+  end
+
+  def github_export(conn, %{"id"=> id, "details"=>details}, user) do
+    company = Repo.get!(Company, user.company_id)
+    ticket = Repo.get!(Ticket, id)
+    details_split = String.split(details, ":")
+    case Discovery.GitHub.create_issue(company.oauth_tokens["github"], List.last(details_split), List.first(details_split), ticket.title, ticket.body) do
+      :error -> conn|>put_flash(:error, "There was an error in the request, please try again")|> redirect(to: ticket_path(conn, :export))|> halt()
+      response -> conn|>put_flash(:info, "Issue Created")|> redirect(to: ticket_path(conn, :index))
+    end
+  end
+
   defp get_users_from_user_company(company_id) do
     Repo.get!(Company, company_id)
     |> company_users()
