@@ -17,8 +17,6 @@
     <%= error_tag f, :tag %>
   </div>
 
-  <a href="https://github.com/login/oauth/authorize?client_id=2b2ea096468468afacb2&scope=repo">Link GitHub</a>
-
   <div class="form-group">
     <%= submit "Submit", class: "btn btn-primary" %>
   </div>
