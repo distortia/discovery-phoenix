@@ -122,25 +122,74 @@ defmodule Discovery.UserControllerTest do
   @tag login_as: "unittest@unittest.com"
   test "Update user - update role - Owner", %{conn: conn, user: user} do
       {:ok, user} = join_company(user, insert_company())
-      user_params = %{"user" => %{first_name: "", last_name: "", role: "Owner", password: ""}}
+      user_params = %{"user" => %{first_name: "a", last_name: "a", role: "Owner", password: ""}}
       conn = put conn, user_path(conn, :update, user.id, user_params)
       assert get_flash(conn, :info) == "User updated successfully."
       assert redirected_to(conn, 302) == user_path(conn, :show, user.id)
   end  
 
   @tag login_as: "unittest@unittest.com"
-  test "Update user - invalid changeset", %{conn: conn, user: user} do
-      # {:ok, user} = join_company(user, insert_company())
-      # conn = put conn, user_path(conn, :update, user.id, %{"user" => %{}})
-      # assert html_response(conn, 302) =~ "Oops, something went wrong! Please check the errors below."
+  test "Update user - invalid changeset - blank name", %{conn: conn, user: user} do
+      {:ok, user} = join_company(user, insert_company())
+      user_params = %{"user" => %{first_name: "a", last_name: "", password: ""}}
+      conn = put conn, user_path(conn, :update, user.id, user_params)
+      assert html_response(conn, 200) =~ "Oops, something went wrong! Please check the errors below."
+      assert html_response(conn, 200) =~ "should be at least 1 character(s)"
   end
+
+  # @tag login_as: "unittest@unittest.com"
+  # test "Change owner", %{conn: conn, user: user} do
+  #   owner = insert_user(email: "test123@test.com", first_name: "second", last_name: "user", role: "Owner")
+  #   company = insert_company()
+  #   {:ok, owner} = join_company(owner, company)
+  #   {:ok, user} = join_company(user, company)
+  #   user_params = %{"user" => %{first_name: "first", last_name: "user", role: "Owner", password: ""}}
+  #   conn = put conn, user_path(conn, :update, user.id, user_params)
+  #   assert get_flash(conn, :info) == "User updated successfully."
+  #   updated_company = Repo.get!(Discovery.Company, company.id) |> Repo.preload(:users)
+  #   IO.inspect updated_company
+  #   # assert updated_company.owner = 
+  # end
 
   @tag login_as: "unittest@unittest.com"
-  test "Change owner", %{conn: conn, user: user} do
-      {:ok, user} = join_company(user, insert_company())
-      user_params = %{"user" => %{first_name: "", last_name: "", role: "Owner", password: ""}}
-      conn = put conn, user_path(conn, :update, user.id, user_params)
+  test "Delete user - no tickets", %{conn: conn, user: user} do
+    conn = delete conn, user_path(conn, :delete, user.id)
+    assert get_flash(conn, :info) == "User deleted successfully."
+    assert redirected_to(conn, 302) == user_path(conn, :index)
+    assert Repo.get(User, user.id) == nil
+  end 
+
+  @tag login_as: "unittest@unittest.com"
+  test "Delete user - with tickets", %{conn: conn, user: user} do
+    ticket = insert_ticket(user, title: "unit test ticket", body: "unit test body", assigned_to: "#{user.id}")
+    conn = delete conn, user_path(conn, :delete, user.id)
+    assert get_flash(conn, :error) == "Please re-assign all tickets from this user before deleting"
+    assert redirected_to(conn, 302) == user_path(conn, :index)
+    assert Repo.get(User, user.id) !== nil
+    assert conn.halted
+  end
+   
+  test "Update Password", %{conn: conn} do
+    user = insert_user(auth_id: "123")
+    update_params = %{"update_form" => %{password: "Val1dP@ass", auth_id: "123"}}
+    conn = post conn, user_path(conn, :update_password, update_params)
+    assert get_flash(conn, :info) == "Password updated successfully."
+    assert redirected_to(conn, 302) == ticket_path(conn, :index)
+    assert Repo.get_by(User, auth_id: "123") == nil
   end
 
+  test "Update password - invalid auth_id", %{conn: conn} do
+    update_params = %{"update_form" => %{password: "Val1dP@ass", auth_id: "invalid"}}
+    conn = post conn, user_path(conn, :update_password, update_params)
+    assert get_flash(conn, :error) == "Unauthorized attempt to change a password. Please try going through the reset password flow again."
+    assert redirected_to(conn, 302) == user_path(conn, :reset)
+    assert conn.halted
+  end
 
+  test "Update Password - invalid password", %{conn: conn} do
+    user = insert_user(auth_id: "123")
+    update_params = %{"update_form" => %{password: "invalid1", auth_id: user.auth_id}}
+    conn = post conn, user_path(conn, :update_password, update_params)
+    assert html_response(conn, 200) =~ "has invalid format"
+  end
 end

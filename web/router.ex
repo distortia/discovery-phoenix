@@ -27,6 +27,7 @@ defmodule Discovery.Router do
     post "/reset", EmailController, :reset
     get "/reset/:auth_id", UserController, :new_password
     post "/reset/update", UserController, :update_password
+    put "/reset/update", UserController, :update_password
   end
 
   scope "/users", Discovery do

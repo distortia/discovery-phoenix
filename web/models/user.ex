@@ -68,7 +68,7 @@ defmodule Discovery.User do
             |> changeset(params)
           _ -> 
             model
-            |> registration_changeset(params)
+            |> password_changeset(params)
         end
       Map.has_key?(params, "password") -> 
         case params["password"] do
@@ -77,7 +77,7 @@ defmodule Discovery.User do
             |> changeset(params)
           _ -> 
             model
-            |> registration_changeset(params)
+            |> password_changeset(params)
           end
       true ->
         :ok
@@ -88,7 +88,13 @@ defmodule Discovery.User do
      model
      |> cast(params, ~w(role), [])
   end
-  
+
+  def reset_password_changeset(model, params \\ :empty) do
+    model
+    |> password_changeset(params)
+    |> put_pass_hash()
+  end
+
   defp put_pass_hash(changeset) do
     case changeset do
       %Ecto.Changeset{valid?: true, changes: %{password: pass}} ->
