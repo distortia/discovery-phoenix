@@ -126,11 +126,12 @@ form.link, form.button {
 }
 
 .btn-github {
+	$github-primary: #4183c4;
 	color: #fff;
-	background: #4183c4;
-}
-.btn-github:hover {
-	color: #d9d9d9;
-	background: #3269a0;
+	background: $github-primary;
+	&:hover {
+		color: #fff;
+		background: darken($github-primary, 5%);
+	}
 }
 
