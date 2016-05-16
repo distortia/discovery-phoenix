@@ -85,7 +85,7 @@ defmodule Discovery.TicketControllerTest do
   test "Show ticket view when logged in", %{conn: conn, user: user} do
     ticket = insert_ticket(user, @valid_attrs)
     conn = get conn, ticket_path(conn, :show, ticket.id), user: user
-    assert html_response(conn, 200) =~ "Show ticket"
+    assert html_response(conn, 200) =~ ticket.title
     assert html_response(conn, 200) =~ @valid_attrs.title
   end  
 
