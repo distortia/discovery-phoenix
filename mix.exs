@@ -22,7 +22,7 @@ defmodule Discovery.Mixfile do
   def application do
     [mod: {Discovery, []},
      applications: [:phoenix, :phoenix_html, :cowboy, :logger, :gettext,
-                    :phoenix_ecto, :postgrex, :comeonin, :bamboo, :exrm, :font_awesome_phoenix]]
+                    :phoenix_ecto, :postgrex, :comeonin, :bamboo, :exrm]]
   end
 
   # Specifies which paths to compile per environment.
