@@ -27,7 +27,6 @@ defmodule Discovery.TicketController do
   # Then validating the ticket changeset to make sure the form
   # is filled in properly
   def new(conn, _params, user) do
-    # Get the company
     changeset = 
     user
     |> build_assoc(:tickets)
@@ -70,32 +69,28 @@ defmodule Discovery.TicketController do
   # We find the specific ticket for the given user using user_tickets/1
   # Render the ticket edit view with the ticket specified and form changeset
   def edit(conn, %{"id" => id}, user) do
-    # ticket = Repo.get!(get_tickets_assigned_to_user(user), id)
     ticket = Repo.get!(Ticket, id)
     changeset = Ticket.changeset(ticket)
-    tags = Repo.get!(Company, user.company_id)
-    case tags.company_tags do
-      nil -> tags = []
-      _ -> tags = tags.company_tags
-    end
-    render(conn, "edit.html", ticket: ticket, changeset: changeset, users: get_users_from_user_company(user.company_id), tags: tags)
+    render(conn, "edit.html", ticket: ticket, changeset: changeset, users: get_users_from_user_company(user.company_id))
   end
 
   # Same deal as Discovery.Ticket.Create/3
   def update(conn, %{"id" => id, "ticket" => ticket_params}, user) do
-    # ticket = Repo.get!(get_tickets_assigned_to_user(user), id)
     ticket = Repo.get!(Ticket, id)
     changeset = 
       Ticket.changeset(ticket, ticket_params)
-
     # Check if the assigned to field was changed so we can change the name
-    case changeset.changes do
-      :assigned_to ->
+    cond do
+      Map.has_key?(changeset.changes, :assigned_to) ->
         changeset =
         changeset 
         |> Ecto.Changeset.put_change(:assigned_to_name, user_full_name(ticket_params["assigned_to"]))
         |> Ecto.Changeset.put_change(:updated_on, "#{Ecto.DateTime.utc}")
-      _ -> 
+
+      Enum.empty?(changeset.changes) ->
+        # Do nothing cause nothing was updated
+        changeset
+      true ->
         changeset = 
         changeset 
         |> Ecto.Changeset.put_change(:updated_on, "#{Ecto.DateTime.utc}")
@@ -107,12 +102,12 @@ defmodule Discovery.TicketController do
         |> put_flash(:info, "Ticket updated successfully")
         |> redirect(to: ticket_path(conn, :index))
       {:error, changeset} ->
-        render(conn, "edit.html", ticket: ticket, changeset: changeset)
+        render(conn, "edit.html", ticket: ticket, changeset: changeset,  users: get_users_from_user_company(user.company_id))
     end
   end
 
   def delete(conn, %{"id" => id}, user) do
-    ticket = Repo.get!(get_tickets_assigned_to_user(user), id)
+    ticket = Repo.get!(Ticket, id)
     Repo.delete!(ticket)
 
     conn

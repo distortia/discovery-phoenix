@@ -6,6 +6,10 @@ defmodule Discovery.UserController do
 
   plug :authenticate_user when action in [:index, :show]
   plug :access_user when action in [:edit, :update, :delete]
+  # scrub params checks for empty params when submitting forms
+  # unfortunately, this means that when we update a user(leaving password blank)
+  # the changeset is rendered invalid
+  # plug :scrub_params, "user" when action in [:create, :update]
 
   def index(conn, _params) do
     users = 
@@ -44,22 +48,11 @@ defmodule Discovery.UserController do
     user = 
     Repo.get!(User, id)
     |> Repo.preload(:company)
-
-    # We have to check for nil here before doing any sort of query
-    # Its an elixir/phoenix thing.
-    if is_nil(user.company_id) do
-      # If the user doesnt have a company id
-      # we can throw in anything into the view to be rendered to @company in the template
-      conn
-        |> assign(:company, "None")
-        |> render("show.html", user: user)
-    else
-      # We found a user with a company and want to return the company name to the template
-      company = Repo.get_by(Discovery.Company, id: user.company_id)
-      conn 
-        |> assign(:company, company)
-        |> render("show.html", user: user)
-    end
+    # We found a user with a company and want to return the company name to the template
+    company = Repo.get_by!(Discovery.Company, id: user.company_id)
+    conn 
+      |> assign(:company, company)
+      |> render("show.html", user: user)
   end
 
   def edit(conn, %{"id" => id}) do
@@ -82,7 +75,7 @@ defmodule Discovery.UserController do
     end
     changeset = User.update_changeset(user, user_params)
     case Repo.update(changeset) do
-      {:ok, user} ->
+      {:ok, _user} ->
         conn
         |> put_flash(:info, "User updated successfully.")
         |> redirect(to: user_path(conn, :show, user))
@@ -103,7 +96,7 @@ defmodule Discovery.UserController do
       _ ->
         conn
          |> put_flash(:error, "Please re-assign all tickets from this user before deleting")
-         |> redirect(to: user_path(conn, :index))
+         |> redirect(to: user_path(conn, :index)) #TODO: Change this to go to where all the tickets are
          |> halt()
     end
   end
@@ -113,25 +106,34 @@ defmodule Discovery.UserController do
   end
 
   def new_password(conn, %{"auth_id" => auth_id}) do
-    render(conn, "update.html", auth_id: auth_id)
+    changeset = User.update_changeset(%User{}, %{password: ""})
+    render(conn, "update.html", auth_id: auth_id, changeset: changeset)
   end
 
+  # This is from the reset password flow
   def update_password(conn, %{"update_form" => update_params}) do
     # find user by auth_id
     user = Repo.get_by(User, auth_id: update_params["auth_id"])
-    # Pass the password to the update_changeset
-    |> User.update_changeset(update_params)
-    #update the user with the new password
-    case Repo.update(user) do
-      {:ok, user} ->
-        # Remove the auth_id
-        
-        Repo.update(Ecto.Changeset.change(user, auth_id: ""))
+    case user do
+      nil ->
         conn
-        |> put_flash(:info, "Password updated successfully.")
-        |> redirect(to: ticket_path(conn, :index))
-      {:error, changeset} ->
-        render(conn, "update.html", auth_id: update_params["auth_id"], changeset: changeset)
+        |> put_flash(:error, "Unauthorized attempt to change a password. Please try going through the reset password flow again.")
+        |> redirect(to: user_path(conn, :reset))
+        |> halt()
+      _ ->
+        # Pass the password to the password_changeset
+        changeset = User.reset_password_changeset(user, update_params)
+        #update the user with the new password
+        case Repo.update(changeset) do
+          {:ok, user} ->
+            # Remove the auth_id
+            Repo.update(Ecto.Changeset.change(changeset, auth_id: ""))
+            conn
+            |> put_flash(:info, "Password updated successfully.")
+            |> redirect(to: ticket_path(conn, :index))
+          {:error, changeset} ->
+            render(conn, "update.html", auth_id: update_params["auth_id"], changeset: changeset)
+        end
     end
   end
 

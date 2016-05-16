@@ -44,7 +44,7 @@
 
   <div class="form-group">
     <%= label f, :tags, class: "control-label" %>
-    <%= multiple_select f, :tags, @tags, class: "form-control" %>
+    <%= multiple_select f, :tags, class: "form-control" %>
     <%= error_tag f, :tags %>
   </div>
 

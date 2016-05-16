@@ -54,7 +54,7 @@ defmodule Discovery.EmailController do
 		# Generate random number of length 10
 		random_auth_id = random_string(10)
 		# Get our user
-		case Repo.one(User, email: email) do
+		case Repo.get_by(User, email: email) do
 			nil -> 
 				# do nothing
 				conn 

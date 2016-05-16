@@ -1,13 +1,13 @@
 <h2>Update Password</h2>
 
 <p>Please enter your new password</p>
-<%= form_for @conn, user_path(@conn, :update_password), [as: :update_form], fn f -> %>
-	<div class="form-group">
-		<label>
-			Password: <%= text_input f, :password, placeholder: "Password" %>
-		</label>
-	</div>
-	<%= hidden_input f, :auth_id, value: @auth_id %>
+<%= form_for @changeset, user_path(@conn, :update_password), [as: :update_form], fn f -> %>
+  <div class="form-group">
+    <label for="password">Password must contain: 8+ characters, 1 uppercase, 1 lowercase, 1 special character !@#$%^&+=</label>
+    <%= text_input f, :password, class: "form-control" %>
+    <%= error_tag f, :password %>
+  </div>
+  <%= hidden_input f, :auth_id, value: @auth_id %>
 
   <div class="form-group">
     <%= submit "Submit", class: "btn btn-primary" %>
