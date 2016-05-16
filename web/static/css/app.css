@@ -125,3 +125,12 @@ form.link, form.button {
   text-transform: uppercase;
 }
 
+.btn-github {
+	color: #fff;
+	background: #4183c4;
+}
+.btn-github:hover {
+	color: #d9d9d9;
+	background: #3269a0;
+}
+
