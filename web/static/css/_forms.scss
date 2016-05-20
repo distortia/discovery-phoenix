@@ -1,0 +1,16 @@
+ul.helper-text {
+    display: block;
+    margin-top: 6px;
+    font-size: 12px;
+    line-height: 22px;
+    color: #808080;
+    list-style: none;
+	    
+	li.valid {
+	  color: #1fd34a;
+	}
+}
+
+.form-group.valid {
+	input { border: 2px solid #1fd34a; }
+}
