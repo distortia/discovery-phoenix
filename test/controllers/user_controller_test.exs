@@ -28,12 +28,6 @@ defmodule Discovery.UserControllerTest do
            assert get_flash(conn, :error) == "Error, You must be logged in to access this page"
       end)
   end
-
-  @tag login_as: "unittest@unittest.com"
-  test "Cannot create a user while logged in", %{conn: conn, user: user} do
-    conn = post conn, user_path(conn, :create), user: @valid_attrs
-    # assert 
-  end
   
   test "Redirect when attempted to make a user without an invite", %{conn: conn} do
     Enum.each([
@@ -46,7 +40,7 @@ defmodule Discovery.UserControllerTest do
   end 
   
   @tag login_as: "unittest@unittest.com"
-  test "Get /Users", %{conn: conn, user: user} do
+  test "Get /Users", %{conn: conn} do
     conn = get conn, user_path(conn, :index)
     assert html_response(conn, 200) =~ ~r/Listing users/
   end
@@ -161,7 +155,7 @@ defmodule Discovery.UserControllerTest do
 
   @tag login_as: "unittest@unittest.com"
   test "Delete user - with tickets", %{conn: conn, user: user} do
-    ticket = insert_ticket(user, title: "unit test ticket", body: "unit test body", assigned_to: "#{user.id}")
+    insert_ticket(user, title: "unit test ticket", body: "unit test body", assigned_to: "#{user.id}")
     conn = delete conn, user_path(conn, :delete, user.id)
     assert get_flash(conn, :error) == "Please re-assign all tickets from this user before deleting"
     assert redirected_to(conn, 302) == user_path(conn, :index)
@@ -170,7 +164,7 @@ defmodule Discovery.UserControllerTest do
   end
    
   test "Update Password", %{conn: conn} do
-    user = insert_user(auth_id: "123")
+    insert_user(auth_id: "123")
     update_params = %{"update_form" => %{password: "Val1dP@ass", auth_id: "123"}}
     conn = post conn, user_path(conn, :update_password, update_params)
     assert get_flash(conn, :info) == "Password updated successfully."

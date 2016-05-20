@@ -1,11 +1,9 @@
 defmodule Discovery.SessionControllerTest do
   use Discovery.ConnCase
 
-  alias Discovery.SessionController
-
   setup %{conn: conn} = config do
     if email = config[:login_as] do
-      user = insert_user(email: "unittest@unittest.com", first_name: "unit", last_name: "test", password: "Val1dP@ass")
+      user = insert_user(email: email, first_name: "unit", last_name: "test", password: "Val1dP@ass")
       conn = assign(conn(), :current_user, user)
       {:ok, conn: conn, user: user}
     else
@@ -35,7 +33,7 @@ defmodule Discovery.SessionControllerTest do
   end
   
   @tag login_as: "unittest@unittest.com"
-  test "Valid login - invalid email", %{conn: conn, user: user} do
+  test "Valid login - invalid email", %{conn: conn} do
     session = %{"session" => %{"email" => "nope", "password" => "invalid"}}
     conn = post conn, session_path(conn, :create, session)
     assert get_flash(conn, :error) == "Invalid email or password"

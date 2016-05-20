@@ -1,14 +1,13 @@
 defmodule Discovery.EmailControllerTest do
 	use Discovery.ConnCase
 	use Bamboo.Test, shared: :true
-	alias Discovery.Company
-	alias Discovery.User
+
 	alias Discovery.EmailController
 	alias Discovery.Email
 
 	setup %{conn: conn} = config do
 		if email = config[:login_as] do
-			user = insert_user(email: "nickstalter+unittest@gmail.com")
+			user = insert_user(email: email)
 			company = insert_company()
 			conn = 
 			assign(conn(), :current_user, user)
@@ -20,14 +19,14 @@ defmodule Discovery.EmailControllerTest do
 	end
 
 	@tag login_as: "unittest@unittest.com"  
-	test "Create soft user - happy path", %{conn: conn, user: user, company: company} do
+	test "Create soft user - happy path", %{} do
 		token = "123"
 		email = "nickstalter+unittest1@gmail.com"
 		assert {:ok, "created"} == EmailController.create_soft_user(email, token)
 	end
 
 	@tag login_as: "unittest@unittest.com"  
-	test "Create soft user - user already invited - no registration - updates token", %{conn: conn, user: user, company: company} do
+	test "Create soft user - user already invited - no registration - updates token", %{} do
 		token = "123"
 		email = "nickstalter+unittest1@gmail.com"
 		EmailController.create_soft_user(email, token)
@@ -35,15 +34,14 @@ defmodule Discovery.EmailControllerTest do
 	end
 
 	@tag login_as: "unittest@unittest.com"  
-	test "Create soft user - user already registered", %{conn: conn, user: user, company: company} do
+	test "Create soft user - user already registered", %{} do
 		token = "123"
-		email = "nickstalter+unittest@gmail.com"
+		email = "unittest@unittest.com"
 		assert {:error, "exists"} == EmailController.create_soft_user(email, token)
 	end
 
 	@tag login_as: "unittest@unittest.com"
-	test "Invite one user - happy path", %{conn: conn, user: user, company: company} do
-		company = insert_company(name: "testComp")
+	test "Invite one user - happy path", %{conn: conn, company: company} do
 		users = %{"email" => "nickstalter+unittest1@gmail.com"}
 		conn = post conn, email_path(conn, :invite, company.id), company: company.id, users: users
 		assert get_flash(conn, :info) == "Invitation sent!"
@@ -51,17 +49,16 @@ defmodule Discovery.EmailControllerTest do
 	end  
 
 	@tag login_as: "unittest@unittest.com"
-	test "Invite one user - user already registered", %{conn: conn, user: user, company: company} do
-		company = insert_company(name: "testComp", unique_id: "123")
-		users = %{"email" => "nickstalter+unittest@gmail.com"}
+	test "Invite one user - user already registered", %{conn: conn, company: company} do
+		known_user = insert_user(email: "nickstalter+unittest@gmail.com")
+		users = %{"email" => known_user.email}
 		conn = post conn, email_path(conn, :invite, company.id), company: company.id, users: users
 		assert get_flash(conn, :error) == "The user you invited has already registered."
 		assert redirected_to(conn) == company_path(conn, :show, company.id)
 	end
 
 	@tag login_as: "unittest@unittest.com"
-	test "Invite many users - happy path", %{conn: conn, user: user, company: company} do
-		company = insert_company(name: "testComp", unique_id: "123")
+	test "Invite many users - happy path", %{conn: conn, company: company} do
 		users = %{"email" => "unittest+unittest@gmail.com, blah@blah.net"}
 		conn = post conn, email_path(conn, :invite, company.id), company: company.id, users: users
 		assert get_flash(conn, :info) == "Invitation sent!"
@@ -69,15 +66,15 @@ defmodule Discovery.EmailControllerTest do
 	end	
 
 	@tag login_as: "unittest@unittest.com"
-	test "Invite many users - one user is already registered", %{conn: conn, user: user, company: company} do
-		company = insert_company(name: "testComp", unique_id: "123")
-		users = %{"email" => "nickstalter+unittest@gmail.com, blah@blah.net"}
+	test "Invite many users - one user is already registered", %{conn: conn, company: company} do
+		known_user = insert_user(email: "nickstalter+unittest@gmail.com")
+		users = %{"email" => "#{known_user.email}, blah@blah.net"}
 		conn = post conn, email_path(conn, :invite, company.id), company: company.id, users: users
 		assert get_flash(conn, :warn) == "One of the users you invited has already registered. Any other invites were sent."
 		assert redirected_to(conn) == company_path(conn, :show, company.id)
 	end
 
-	test "Invite user email - single user", %{conn: conn} do
+	test "Invite user email - single user", %{} do
 		company = insert_company(name: "testComp", unique_id: "123")
 		email = "test@test.com"
 		token = "123"
@@ -89,7 +86,7 @@ defmodule Discovery.EmailControllerTest do
      	Click this link to join: #{link}"
 	end
 
-	test "Invite user email - multiple users", %{conn: conn} do
+	test "Invite user email - multiple users", %{} do
 		company = insert_company(name: "testComp", unique_id: "123")
 		emails = 
 		"test@test.com, test2@test.com"
@@ -107,7 +104,7 @@ defmodule Discovery.EmailControllerTest do
 	     end)
 	end
 
-	test "Sending of invite user email", %{conn: conn} do
+	test "Sending of invite user email", %{} do
 		company = insert_company(name: "testComp")
 		unique_id = "123"
 		email = "test@test.com"
@@ -121,7 +118,7 @@ defmodule Discovery.EmailControllerTest do
 		assert_delivered_email(sent_email)
 	end
 
-	test "Reset password email", %{conn: conn} do
+	test "Reset password email", %{} do
 		random_auth_id = "123"
 		link = "http://localhost:4000/users/reset/#{random_auth_id}"
 		email = "test@test.com"
@@ -134,7 +131,7 @@ defmodule Discovery.EmailControllerTest do
 	end
 
 
-	test "Sending of reset password email", %{conn: conn} do
+	test "Sending of reset password email", %{} do
 		random_auth_id = "123"
 		link = "http://localhost:4000/users/reset/#{random_auth_id}"
 		email = "test@test.com"

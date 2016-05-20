@@ -14,7 +14,7 @@ defmodule Discovery.TicketControllerTest do
     if email = config[:login_as] do
       company = insert_company()
       {:ok, user} = 
-      insert_user(email: "unittest@unittest.com", first_name: "unit", last_name: "test", password: "Val1dP@ass")
+      insert_user(email: email, first_name: "unit", last_name: "test", password: "Val1dP@ass")
       |> join_company(company)
       conn = assign(conn(), :current_user, user)
       {:ok, conn: conn, user: user, company: company}
@@ -44,7 +44,7 @@ defmodule Discovery.TicketControllerTest do
   end
 
   @tag login_as: "unittest@unittest.com"
-  test "Create ticket and redirect - assigned to another user", %{conn: conn, user: user} do
+  test "Create ticket and redirect - assigned to another user", %{conn: conn} do
     other_user = insert_user(email: "other@user.com")
     ticket_params = %{title: "Ticket title", body: "ticket body", assigned_to: "#{other_user.id}"}
     conn = post conn, ticket_path(conn, :create), ticket: ticket_params, user: "unittest@unittest.com"

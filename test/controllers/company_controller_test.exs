@@ -1,11 +1,9 @@
 defmodule Discovery.CompanyControllerTest do
   use Discovery.ConnCase
 
-  alias Discovery.Company
-
   setup %{conn: conn} = config do
     if email = config[:login_as] do
-      user = insert_user(email: "unittest@unittest.com", first_name: "unit", last_name: "test", password: "Val1dP@ass")
+      user = insert_user(email: email, first_name: "unit", last_name: "test", password: "Val1dP@ass")
       company = insert_company(name: "testComp")
       conn = assign(conn(), :current_user, user)
       {:ok, conn: conn, user: user}
