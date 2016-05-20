@@ -35,5 +35,7 @@ defmodule Discovery.Ticket do
   def changeset(model, params \\ :empty) do
     model
     |> cast(params, @required_fields, @optional_fields)
+    |> validate_inclusion(:status, ["Open", "In Progress", "Closed", "Waiting For Action", "Non-Issue", "Suspended"])
+    |> validate_inclusion(:severity, ["Low", "Normal", "High"])
   end
 end

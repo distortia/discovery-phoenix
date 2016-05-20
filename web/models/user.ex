@@ -30,6 +30,7 @@ defmodule Discovery.User do
     |> cast(params, ~w(first_name last_name role), ~w(auth_id))
     |> validate_length(:first_name, min: 1)
     |> validate_length(:last_name, min: 1)
+    |> validate_inclusion(:role, ["User", "Owner", "Admin"])
     |> email_changeset(params)
   end
 
