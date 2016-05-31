@@ -45,7 +45,8 @@ defmodule Discovery.Mixfile do
      {:excoveralls, "~> 0.4", only: :test},
      {:exrm, "~> 0.19.9"},
      {:font_awesome_phoenix, "~> 0.1"},
-     {:slugger, "~> 0.1.0"}
+     {:slugger, "~> 0.1.0"},
+     {:ja_serializer, "~> 0.9.0"}
      ]
   end
 
