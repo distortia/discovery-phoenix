@@ -38,3 +38,4 @@
 
 
 <%= link "New ticket", to: ticket_path(@conn, :new) %>
+

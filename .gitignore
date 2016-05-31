@@ -30,3 +30,6 @@ mix.lock
 
 # Coveralls reports
 /cover
+
+# Bower components
+/web/static/assets/bower_components

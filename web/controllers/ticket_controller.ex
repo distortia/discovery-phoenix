@@ -6,7 +6,6 @@ defmodule Discovery.TicketController do
   alias Discovery.User
 
   plug :scrub_params, "ticket" when action in [:create, :update]
-
   # This Action assigns the current user to the connection
   # Allowing us to pass the user to different controllers and routes
   # https://github.com/phoenixframework/phoenix/blob/master/lib/phoenix/controller.ex#L96
