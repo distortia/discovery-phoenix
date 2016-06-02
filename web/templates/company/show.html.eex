@@ -32,7 +32,8 @@
 
 <h2>Linked Accounts</h2>
   <%= if (@company.oauth_tokens["github"]) do %>
- 	 GitHub Account Linked
+ 	 GitHub Account Linked<br>
+ 	 <a href="https://github.com/settings/connections/applications/2b2ea096468468afacb2">Unlink Github</a>
   <% else %>
      <a href="https://github.com/login/oauth/authorize?client_id=2b2ea096468468afacb2&scope=repo">Link GitHub</a>
   <% end %>

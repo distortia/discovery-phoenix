@@ -58,8 +58,13 @@ defmodule Discovery.CompanyController do
         user.tickets
        end
     tickets = List.flatten(tickets)
-    # I passed users/tickets as their own thing to the view for ease of use
-    render(conn, "show.html", company: company, users: company.users, tickets: tickets)
+    response = check_accounts_linked(company)
+    case check_accounts_linked(company) do
+      :error -> conn|> put_flash(:error, "There was an error in the request, please try again")|> redirect(to: company_path(conn, :show, company))|> halt() 
+      {:ok, updatedCompany} -> conn |> put_flash(:info, "Your GitHub Account Has Been Unlinked")|> redirect(to: company_path(conn, :show, updatedCompany))
+      _ ->  # I passed users/tickets as their own thing to the view for ease of use
+            render(conn, "show.html", company: company, users: company.users, tickets: tickets)
+    end
   end
 
   def edit(conn, %{"id" => id}, user) do
@@ -189,6 +194,30 @@ defmodule Discovery.CompanyController do
        |> put_flash(:error, "Error, You do not have access do this")
        |> redirect(to: Discovery.Router.Helpers.page_path(conn, :index))
        |> halt()  
+    end
+  end
+
+  defp check_accounts_linked(company) do
+    if company.oauth_tokens["github"] do
+      case Discovery.GitHub.get_repos(company.oauth_tokens["github"]) do
+        :error -> :error
+        response -> 
+          tmp = %{}
+          decoded_map = Poison.decode!((to_string(response.body)), as: tmp)
+          if(is_map(decoded_map) and Map.has_key?(decoded_map, "message")) do
+            updated_oauth = Map.delete(company.oauth_tokens, "github")
+            params = %{"name" => company.name, "oauth_tokens" => updated_oauth}
+            changeset = Company.changeset(company, params)
+            case Repo.update(changeset) do
+              {:ok, updatedCompany} -> {:ok, updatedCompany}
+              {:error, changeset} -> :error
+            end          
+          else
+            :ok  
+          end
+      end
+    else
+      :ok
     end
   end
 

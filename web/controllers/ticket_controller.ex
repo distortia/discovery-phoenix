@@ -127,14 +127,18 @@ defmodule Discovery.TicketController do
           tmp = []
           decoded_list = Poison.decode!((to_string(response.body)), as: tmp)
           if(is_map(decoded_list)) do
-            conn|> put_flash(:error, "Error Fetching GitHub Repos (Did you revoke the OAuth? If so, please unlink your Github account)")|> redirect(to: company_path(conn, :show, company))|> halt()
+            conn|> put_flash(:error, "Error Fetching GitHub Repos, Please Try Again")|> redirect(to: company_path(conn, :show, company))|> halt()
           end
           repo_details = 
             case length(decoded_list) do
               0 -> []
               _ -> for repo <- decoded_list, repo["owner"] do %{"name" => repo["name"], "owner"=> repo["owner"]["login"]} end
             end
-          github_account = [%{"github" => repo_details}]
+          github_account = 
+            case length(repo_details) do
+              0 -> []
+              _-> [%{"github" => repo_details}]              
+            end
           accounts = accounts ++ github_account
       end
     end
