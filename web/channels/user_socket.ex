@@ -4,6 +4,8 @@ defmodule Discovery.UserSocket do
   ## Channels
   # channel "rooms:*", Discovery.RoomChannel
 
+  channel "lobby", Chatroom.LobbyChannel
+  
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket
   # transport :longpoll, Phoenix.Transports.LongPoll

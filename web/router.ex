@@ -14,10 +14,9 @@ defmodule Discovery.Router do
     pipe_through :browser # Use the default browser stack
 
     get "/", PageController, :index
+    get "/chat", PageController, :chat_view
     # Sessions is our login controller:o
     resources "/sessions", SessionController, only: [:new, :create, :delete]
-
-    get "/chat", ChatController, :index
   end
 
   # Unauthenticated user actions
@@ -51,6 +50,7 @@ defmodule Discovery.Router do
   # Companies router + middleware
   scope "/companies", Discovery do
     pipe_through [:browser, :authenticate_user]
+    # get "/join", CompanyController, :join
     get "/join", CompanyController, :join_company
     get "/github_link", CompanyController, :github_link
     resources "/", CompanyController, except: [:join, :github_link]
